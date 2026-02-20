@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monty Hall Problem</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --dark: #0a0806;
+    --dark2: #1a1410;
+    --dark3: #2a2018;
+    --cream: #f0e8d0;
+    --muted: #8a7a5a;
+    --red: #c0392b;
+    --green: #27ae60;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: 0.02em;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  /* Stats bar */
+  .stats {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 35px;
+    background: var(--dark2);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 14px 28px;
+    border-radius: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--gold-light);
+  }
+
+  .stat-pct {
+    font-size: 0.65rem;
+    color: var(--muted);
+    display: block;
+  }
+
+  /* Phase indicator */
+  .phase-indicator {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    min-height: 1.2em;
+    text-align: center;
+    transition: opacity 0.3s;
+  }
+
+  /* Doors container */
+  .doors {
+    display: flex;
+    gap: clamp(10px, 3vw, 24px);
+    margin-bottom: 30px;
+    justify-content: center;
+  }
+
+  .door-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .door-num {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .door {
+    width: clamp(90px, 22vw, 140px);
+    height: clamp(160px, 40vw, 240px);
+    background: var(--dark2);
+    border: 2px solid rgba(201,168,76,0.3);
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .door:hover:not(.no-hover) {
+    border-color: var(--gold);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(201,168,76,0.2);
+  }
+
+  .door.selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold), 0 8px 25px rgba(201,168,76,0.25);
+  }
+
+  .door.eliminated {
+    border-color: rgba(192,57,43,0.4);
+    opacity: 0.7;
+    cursor: default;
+  }
+
+  .door.winner {
+    border-color: var(--green);
+    box-shadow: 0 0 0 1px var(--green), 0 8px 25px rgba(39,174,96,0.3);
+    animation: winPulse 0.6s ease;
+  }
+
+  .door.loser {
+    border-color: var(--red);
+    box-shadow: 0 0 0 1px var(--red);
+  }
+
+  @keyframes winPulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  /* Door wood texture lines */
+  .door::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(201,168,76,0.12);
+    pointer-events: none;
+  }
+
+  .door-knob {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.6;
+    box-shadow: 0 0 6px rgba(201,168,76,0.5);
+    transition: opacity 0.3s;
+  }
+
+  .door:hover:not(.no-hover) .door-knob { opacity: 1; }
+  .door.selected .door-knob { opacity: 1; }
+
+  .door-content {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.4s, transform 0.4s;
+    text-align: center;
+  }
+
+  .door.revealed .door-content {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .door-label {
+    position: absolute;
+    bottom: 10px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .door.revealed .door-label { opacity: 1; }
+
+  /* Action area */
+  .action-area {
+    text-align: center;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .message {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+    color: var(--cream);
+    max-width: 460px;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  button {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 11px 24px;
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+    border-radius: 1px;
+  }
+
+  button:hover {
+    background: var(--gold);
+    color: var(--dark);
+    transform: translateY(-1px);
+  }
+
+  button:active { transform: translateY(0); }
+
+  button.primary {
+    background: var(--gold);
+    color: var(--dark);
+  }
+
+  button.primary:hover {
+    background: var(--gold-light);
+  }
+
+  button.danger {
+    border-color: var(--red);
+    color: var(--red);
+  }
+  button.danger:hover {
+    background: var(--red);
+    color: white;
+  }
+
+  /* Result banner */
+  .result-banner {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    font-weight: 700;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  .result-banner.win { color: var(--green); }
+  .result-banner.lose { color: var(--red); }
+
+  /* Explanation box */
+  .explanation {
+    margin-top: 28px;
+    max-width: 560px;
+    background: var(--dark2);
+    border-left: 3px solid var(--gold);
+    padding: 18px 22px;
+    font-size: 0.72rem;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .explanation strong {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  /* Auto sim */
+  .auto-sim {
+    margin-top: 28px;
+    text-align: center;
+  }
+
+  .auto-sim-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .divider {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 28px auto;
+  }
+
+  @media (max-width: 400px) {
+    .stats { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>The Monty Hall</h1>
+<p class="subtitle">A probability paradox</p>
+
+<div class="stats">
+  <div class="stat">
+    <span class="stat-label">Games</span>
+    <span class="stat-value" id="totalGames">0</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Stayed &amp; Won</span>
+    <span class="stat-value" id="stayWins">0</span>
+    <span class="stat-pct" id="stayPct">—</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Switched &amp; Won</span>
+    <span class="stat-value" id="switchWins">0</span>
+    <span class="stat-pct" id="switchPct">—</span>
+  </div>
+</div>
+
+<div class="phase-indicator" id="phaseText">Choose a door</div>
+
+<div class="doors" id="doorsContainer">
+  <div class="door-wrap">
+    <div class="door" id="door0" onclick="selectDoor(0)">
+      <div class="door-content" id="content0"></div>
+      <div class="door-knob"></div>
+      <div class="door-label" id="label0"></div>
+    </div>
+    <span class="door-num">Door I</span>
+  </div>
+  <div class="door-wrap">
+    <div class="door" id="door1" onclick="selectDoor(1)">
+      <div class="door-content" id="content1"></div>
+      <div class="door-knob"></div>
+      <div class="door-label" id="label1"></div>
+    </div>
+    <span class="door-num">Door II</span>
+  </div>
+  <div class="door-wrap">
+    <div class="door" id="door2" onclick="selectDoor(2)">
+      <div class="door-content" id="content2"></div>
+      <div class="door-knob"></div>
+      <div class="door-label" id="label2"></div>
+    </div>
+    <span class="door-num">Door III</span>
+  </div>
+</div>
+
+<div class="action-area" id="actionArea">
+  <p class="message" id="messageText">Pick any door. Behind one lies a 🚗 — behind the others, a 🐐.</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="auto-sim">
+  <div class="auto-sim-title">Auto-simulate to prove the paradox</div>
+  <div class="btn-row">
+    <button onclick="autoSim(100)">Run 100</button>
+    <button onclick="autoSim(1000)">Run 1,000</button>
+    <button onclick="resetStats()">Reset Stats</button>
+  </div>
+</div>
+
+<div class="explanation">
+  <strong>The Paradox:</strong> Your intuition says switching vs. staying is 50/50 — but it's not.
+  When you first pick, you have a 1/3 chance of being right. That means there's a <strong>2/3 chance</strong> the car is behind one of the other doors. When Monty opens a goat door, that 2/3 probability collapses entirely onto the remaining unopened door.
+  <strong>Switching wins ~66% of the time.</strong>
+</div>
+
+<script>
+  // Game state
+  let phase = 'pick'; // pick | switch | done
+  let carDoor = -1;
+  let chosen = -1;
+  let eliminated = -1;
+
+  // Stats
+  let totalGames = 0;
+  let stayWins = 0;
+  let switchWins = 0;
+  let stayTotal = 0;
+  let switchTotal = 0;
+
+  function initGame() {
+    phase = 'pick';
+    carDoor = Math.floor(Math.random() * 3);
+    chosen = -1;
+    eliminated = -1;
+
+    for (let i = 0; i < 3; i++) {
+      const door = document.getElementById('door' + i);
+      door.className = 'door';
+      document.getElementById('content' + i).textContent = '';
+      document.getElementById('label' + i).textContent = '';
+    }
+
+    setPhaseText('Choose a door');
+    setMessage('Pick any door. Behind one lies a 🚗 — behind the others, a 🐐.');
+    setActionHTML('');
+  }
+
+  function selectDoor(idx) {
+    if (phase === 'pick') {
+      chosen = idx;
+      document.getElementById('door' + idx).classList.add('selected');
+      
+      // Monty eliminates a goat door
+      let candidates = [0,1,2].filter(d => d !== chosen && d !== carDoor);
+      eliminated = candidates[Math.floor(Math.random() * candidates.length)];
+
+      // Reveal goat
+      const elDoor = document.getElementById('door' + eliminated);
+      elDoor.classList.add('eliminated', 'revealed', 'no-hover');
+      document.getElementById('content' + eliminated).textContent = '🐐';
+      document.getElementById('label' + eliminated).textContent = 'Goat';
+
+      phase = 'switch';
+      const altDoor = [0,1,2].find(d => d !== chosen && d !== eliminated);
+      setPhaseText('Stay or Switch?');
+      setMessage(`Monty opens Door ${toRoman(eliminated+1)} revealing a goat. Will you stay with Door ${toRoman(chosen+1)}, or switch to Door ${toRoman(altDoor+1)}?`);
+      
+      setActionHTML(`
+        <div class="btn-row">
+          <button class="primary" onclick="resolve(false)">Stay with Door ${toRoman(chosen+1)}</button>
+          <button onclick="resolve(true)">Switch to Door ${toRoman(altDoor+1)}</button>
+        </div>
+      `);
+
+    } else if (phase === 'switch') {
+      // clicking a door = switching to it
+      if (idx !== eliminated && idx !== chosen) {
+        resolve(true);
+      }
+    }
+  }
+
+  function resolve(switched) {
+    if (switched) {
+      chosen = [0,1,2].find(d => d !== chosen && d !== eliminated);
+    }
+
+    const won = chosen === carDoor;
+    phase = 'done';
+    totalGames++;
+
+    if (switched) {
+      switchTotal++;
+      if (won) switchWins++;
+    } else {
+      stayTotal++;
+      if (won) stayWins++;
+    }
+
+    // Reveal all doors
+    for (let i = 0; i < 3; i++) {
+      const door = document.getElementById('door' + i);
+      door.classList.add('revealed', 'no-hover');
+      document.getElementById('content' + i).textContent = i === carDoor ? '🚗' : '🐐';
+      document.getElementById('label' + i).textContent = i === carDoor ? 'Car!' : 'Goat';
+    }
+
+    document.getElementById('door' + chosen).classList.remove('selected');
+    document.getElementById('door' + chosen).classList.add(won ? 'winner' : 'loser');
+
+    const action = switched ? 'Switched' : 'Stayed';
+    setPhaseText(won ? '— You Won! —' : '— You Lost —');
+    setMessage(`<span class="result-banner ${won?'win':'lose'}">${won ? 'You Won the Car!' : 'You Got a Goat.'}</span><br><em>${action} — ${won ? 'the right call' : 'better luck next time'}.</em>`);
+    setActionHTML(`<button class="primary" onclick="initGame()">Play Again</button>`);
+
+    updateStats();
+  }
+
+  function updateStats() {
+    document.getElementById('totalGames').textContent = totalGames;
+    document.getElementById('stayWins').textContent = stayWins;
+    document.getElementById('switchWins').textContent = switchWins;
+    document.getElementById('stayPct').textContent = stayTotal > 0 ? `${Math.round(stayWins/stayTotal*100)}% of ${stayTotal}` : '—';
+    document.getElementById('switchPct').textContent = switchTotal > 0 ? `${Math.round(switchWins/switchTotal*100)}% of ${switchTotal}` : '—';
+  }
+
+  function autoSim(n) {
+    for (let i = 0; i < n; i++) {
+      const car = Math.floor(Math.random() * 3);
+      const pick = Math.floor(Math.random() * 3);
+      let cands = [0,1,2].filter(d => d !== pick && d !== car);
+      const elim = cands[Math.floor(Math.random() * cands.length)];
+      const alt = [0,1,2].find(d => d !== pick && d !== elim);
+
+      // Stay
+      totalGames++;
+      stayTotal++;
+      if (pick === car) stayWins++;
+
+      // Switch
+      totalGames++;
+      switchTotal++;
+      if (alt === car) switchWins++;
+    }
+    updateStats();
+  }
+
+  function resetStats() {
+    totalGames = stayWins = switchWins = stayTotal = switchTotal = 0;
+    updateStats();
+  }
+
+  function setPhaseText(t) {
+    document.getElementById('phaseText').textContent = t;
+  }
+
+  function setMessage(html) {
+    document.getElementById('messageText').innerHTML = html;
+  }
+
+  function setActionHTML(html) {
+    const area = document.getElementById('actionArea');
+    const msg = area.querySelector('.message');
+    // Remove old buttons
+    const old = area.querySelector('.btn-row');
+    if (old) old.remove();
+    if (html) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      area.appendChild(div.firstElementChild);
+    }
+  }
+
+  function toRoman(n) {
+    return ['I','II','III'][n-1] || n;
+  }
+
+  initGame();
+</script>
+</body>
+</html>

@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLACK BOX – Guess The Hidden Rule</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030508;
+    --panel: rgba(5, 12, 20, 0.92);
+    --border: #0ff;
+    --accent: #0ff;
+    --accent2: #f0f;
+    --accept: #00ff88;
+    --reject: #ff2244;
+    --text: #c8e6ff;
+    --muted: #4a6a8a;
+    --glow: 0 0 20px #0ff8, 0 0 60px #0ff3;
+    --glow2: 0 0 20px #f0f8, 0 0 60px #f0f3;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ─── ANIMATED GRID BG ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridDrift 20s linear infinite;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(0,255,255,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(255,0,255,0.04) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+    animation: pulseGlow 6s ease-in-out infinite alternate;
+  }
+  @keyframes gridDrift { from { background-position: 0 0; } to { background-position: 40px 40px; } }
+  @keyframes pulseGlow { from { opacity: 0.5; } to { opacity: 1; } }
+
+  /* ─── PARTICLES ─── */
+  #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: float linear infinite;
+    opacity: 0;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.5; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  /* ─── LAYOUT ─── */
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: auto;
+    gap: 20px;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px 0 10px;
+    animation: slideDown 0.8s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-40px); } to { opacity: 1; transform: none; } }
+
+  .title-row { display: flex; align-items: center; justify-content: center; gap: 16px; }
+  .eye {
+    width: 36px; height: 36px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: var(--glow);
+    animation: blink 4s ease-in-out infinite;
+  }
+  .eye::after {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: eyeMove 4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,90%,100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+  @keyframes eyeMove { 0%,100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+
+  h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { from { background-position: 0 center; } to { background-position: 200% center; } }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* ─── PANELS ─── */
+  .panel {
+    background: var(--panel);
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.6s both;
+    transition: border-color 0.3s;
+  }
+  .panel:hover { border-color: rgba(0,255,255,0.5); }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .panel-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,255,255,0.4), transparent);
+  }
+
+  /* ─── BLACK BOX ─── */
+  .box-section {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .black-box-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 30px;
+  }
+
+  .black-box {
+    width: 180px; height: 180px;
+    background: #000;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    position: relative;
+    box-shadow: var(--glow), inset 0 0 60px rgba(0,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+    animation: boxPulse 4s ease-in-out infinite;
+  }
+  @keyframes boxPulse {
+    0%,100% { box-shadow: 0 0 20px #0ff8, 0 0 60px #0ff3; }
+    50% { box-shadow: 0 0 40px #0ffb, 0 0 100px #0ff5, 0 0 20px #f0f4; }
+  }
+  .black-box:hover { transform: scale(1.03); }
+
+  .box-inner {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    color: rgba(0,255,255,0.3);
+    letter-spacing: 0.2em;
+    text-align: center;
+    line-height: 2;
+    user-select: none;
+  }
+
+  .box-scan {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: scan 2.5s ease-in-out infinite;
+    opacity: 0.7;
+  }
+  @keyframes scan {
+    0% { top: 0; opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* box corner decorations */
+  .corner { position: absolute; width: 14px; height: 14px; }
+  .corner.tl { top: -2px; left: -2px; border-top: 3px solid var(--accent2); border-left: 3px solid var(--accent2); }
+  .corner.tr { top: -2px; right: -2px; border-top: 3px solid var(--accent2); border-right: 3px solid var(--accent2); }
+  .corner.bl { bottom: -2px; left: -2px; border-bottom: 3px solid var(--accent2); border-left: 3px solid var(--accent2); }
+  .corner.br { bottom: -2px; right: -2px; border-bottom: 3px solid var(--accent2); border-right: 3px solid var(--accent2); }
+
+  /* ─── INPUT AREA ─── */
+  .input-group { display: flex; gap: 10px; align-items: stretch; }
+
+  input[type="number"], input[type="text"] {
+    background: rgba(0,255,255,0.05);
+    border: 1px solid rgba(0,255,255,0.3);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: all 0.3s;
+    width: 100%;
+  }
+  input[type="number"]:focus, input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(0,255,255,0.2);
+    background: rgba(0,255,255,0.08);
+  }
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  button {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    padding: 10px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.25s;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+  }
+  button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  button:hover::before { opacity: 0.12; }
+  button:hover { box-shadow: 0 0 20px rgba(0,255,255,0.4); transform: translateY(-1px); }
+  button:active { transform: translateY(0); }
+
+  button.danger { border-color: var(--reject); color: var(--reject); }
+  button.danger::before { background: var(--reject); }
+  button.danger:hover { box-shadow: 0 0 20px rgba(255,34,68,0.4); }
+
+  button.success { border-color: var(--accept); color: var(--accept); }
+  button.success::before { background: var(--accept); }
+  button.success:hover { box-shadow: 0 0 20px rgba(0,255,136,0.4); }
+
+  /* ─── RESULT DISPLAY ─── */
+  .result-display {
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,255,255,0.1);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0,0,0,0.4);
+  }
+
+  .result-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    opacity: 0;
+    transition: all 0.4s;
+    transform: scale(0.5);
+  }
+  .result-text.show { opacity: 1; transform: scale(1); }
+  .result-text.accepted { color: var(--accept); text-shadow: 0 0 30px var(--accept), 0 0 60px rgba(0,255,136,0.4); }
+  .result-text.rejected { color: var(--reject); text-shadow: 0 0 30px var(--reject), 0 0 60px rgba(255,34,68,0.4); }
+  .result-text.analyzing { color: var(--accent); font-size: 0.8rem; text-shadow: var(--glow); }
+
+  .ai-msg {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-align: center;
+    min-height: 20px;
+    margin-top: 6px;
+    transition: all 0.4s;
+    letter-spacing: 0.05em;
+  }
+  .ai-msg.glow { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+
+  /* ─── HISTORY ─── */
+  .history-list {
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
+  }
+  .history-list::-webkit-scrollbar { width: 4px; }
+  .history-list::-webkit-scrollbar-track { background: transparent; }
+  .history-list::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 3px;
+    border-left: 3px solid transparent;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .history-item.acc { border-left-color: var(--accept); }
+  .history-item.rej { border-left-color: var(--reject); }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: none; } }
+
+  .history-num { color: var(--text); }
+  .history-badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .badge-acc { background: rgba(0,255,136,0.15); color: var(--accept); border: 1px solid rgba(0,255,136,0.3); }
+  .badge-rej { background: rgba(255,34,68,0.15); color: var(--reject); border: 1px solid rgba(255,34,68,0.3); }
+
+  .empty-history {
+    text-align: center;
+    color: var(--muted);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    padding: 20px;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ─── STATS ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-box {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(0,255,255,0.15);
+    border-radius: 4px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(0,255,255,0.5);
+    display: block;
+  }
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* ─── DIFFICULTY ─── */
+  .diff-btns { display: flex; gap: 8px; }
+  .diff-btn {
+    flex: 1;
+    font-size: 0.58rem;
+    padding: 8px 6px;
+    border-color: var(--muted);
+    color: var(--muted);
+  }
+  .diff-btn.active { border-color: var(--accent2); color: var(--accent2); box-shadow: 0 0 15px rgba(255,0,255,0.3); }
+  .diff-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ─── TIMER ─── */
+  .timer-display {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 0.1em;
+    text-shadow: var(--glow);
+    padding: 10px;
+  }
+  .timer-display.warning { color: #ff8800; text-shadow: 0 0 20px rgba(255,136,0,0.6); animation: warnPulse 0.5s ease-in-out infinite alternate; }
+  .timer-display.danger { color: var(--reject); text-shadow: 0 0 20px rgba(255,34,68,0.6); }
+  @keyframes warnPulse { from { opacity: 0.7; } to { opacity: 1; } }
+
+  .timer-toggle { width: 100%; margin-top: 8px; font-size: 0.58rem; }
+
+  /* ─── GUESS SECTION ─── */
+  .guess-area { display: flex; flex-direction: column; gap: 10px; }
+
+  .guess-feedback {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,255,255,0.1);
+    border-radius: 4px;
+    padding: 10px;
+    background: rgba(0,0,0,0.3);
+  }
+  .guess-feedback-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* ─── CONTROLS ─── */
+  .ctrl-btns { display: flex; gap: 10px; }
+  .ctrl-btn { flex: 1; font-size: 0.58rem; padding: 10px 8px; }
+
+  /* ─── VICTORY ─── */
+  #victory-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeIn 0.5s both;
+  }
+  #victory-overlay.show { display: flex; }
+  .victory-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--accept), var(--accent), var(--accept));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 1.5s linear infinite;
+    text-align: center;
+  }
+  .victory-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    color: var(--accent);
+    text-align: center;
+    max-width: 400px;
+  }
+  #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
+
+  /* ─── FLASH OVERLAY ─── */
+  .flash {
+    position: fixed; inset: 0; pointer-events: none; z-index: 50;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .flash.green { background: rgba(0,255,136,0.08); }
+  .flash.red { background: rgba(255,34,68,0.08); }
+  .flash.active { opacity: 1; }
+
+  /* ─── SCANLINE ─── */
+  .scanline {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none; z-index: 1; opacity: 0.4;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 760px) {
+    .wrapper { grid-template-columns: 1fr; }
+    .sidebar { grid-column: 1; }
+    .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .diff-btns { flex-wrap: wrap; }
+  }
+
+  /* ─── MISC ─── */
+  .sep { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent); margin: 4px 0; }
+  .full-btn { width: 100%; margin-top: 4px; font-size: 0.6rem; }
+
+  .hint-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+<div id="particles"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- FLASH OVERLAY -->
+<div class="flash green" id="flash-green"></div>
+<div class="flash red" id="flash-red"></div>
+
+<!-- VICTORY OVERLAY -->
+<div id="victory-overlay">
+  <div class="victory-title">✓ RULE DECODED</div>
+  <div class="victory-sub" id="victory-rule-text"></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--muted)" id="victory-stats"></div>
+  <button onclick="closeVictory()" style="margin-top:10px">[ PLAY AGAIN ]</button>
+</div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="title-row">
+      <div class="eye"></div>
+      <h1>BLACK BOX</h1>
+      <div class="eye" style="animation-delay:0.5s"></div>
+    </div>
+    <div class="subtitle">Classified Intelligence Inference System // v2.4.1</div>
+  </header>
+
+  <!-- ═══ MAIN COLUMN ═══ -->
+  <div class="box-section">
+
+    <!-- BOX + INPUT PANEL -->
+    <div class="panel black-box-container" style="animation-delay:0.1s">
+      <div class="black-box" id="blackBox" onclick="boxClick()">
+        <div class="box-scan"></div>
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+        <div class="box-inner">
+          CLASSIFIED<br>
+          ▓▓▓▒▒░░<br>
+          RULE: UNKNOWN<br>
+          ░░▒▒▓▓▓<br>
+          ACCESS DENIED
+        </div>
+      </div>
+
+      <div style="width:100%;max-width:440px">
+        <div class="panel-label">Test Input</div>
+        <div class="input-group">
+          <input type="number" id="numInput" placeholder="Enter a number..." min="-9999" max="9999" />
+          <button id="testBtn" onclick="testNumber()">▶ TEST</button>
+        </div>
+        <div class="hint-row">
+          <span id="range-hint">Range: any integer</span>
+          <span>ENTER to test</span>
+        </div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-display" style="width:100%;max-width:440px">
+        <div class="result-text" id="resultText">─</div>
+      </div>
+      <div class="ai-msg" id="aiMsg">Awaiting input from operator...</div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="panel" style="animation-delay:0.2s">
+      <div class="panel-label">Test History</div>
+      <div class="history-list" id="historyList">
+        <div class="empty-history" id="emptyHistory">No tests performed yet.<br>Begin your investigation.</div>
+      </div>
+    </div>
+
+    <!-- GUESS THE RULE -->
+    <div class="panel" style="animation-delay:0.3s">
+      <div class="panel-label">Decode the Rule</div>
+      <div class="guess-area">
+        <input type="text" id="guessInput" placeholder="Describe the hidden rule..." />
+        <button class="success full-btn" onclick="submitGuess()">⬡ SUBMIT HYPOTHESIS</button>
+        <div class="guess-feedback">
+          <div class="guess-feedback-text" id="guessFeedback">Your hypothesis will be evaluated here...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <div class="sidebar">
+
+    <!-- STATS -->
+    <div class="panel" style="animation-delay:0.15s">
+      <div class="panel-label">Analytics</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-val" id="stat-tests">0</span>
+          <span class="stat-label">Tests Run</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-val" id="stat-guesses">0</span>
+          <span class="stat-label">Guesses</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-val" id="stat-acc">–</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-val" id="stat-time">0:00</span>
+          <span class="stat-label">Elapsed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIFFICULTY -->
+    <div class="panel" style="animation-delay:0.2s">
+      <div class="panel-label">Difficulty</div>
+      <div class="diff-btns">
+        <button class="diff-btn active" id="d-easy" onclick="setDifficulty('easy')">EASY</button>
+        <button class="diff-btn" id="d-medium" onclick="setDifficulty('medium')">MED</button>
+        <button class="diff-btn" id="d-hard" onclick="setDifficulty('hard')">HARD</button>
+      </div>
+    </div>
+
+    <!-- TIMER -->
+    <div class="panel" style="animation-delay:0.25s">
+      <div class="panel-label">Countdown</div>
+      <div class="timer-display" id="timerDisplay">OFF</div>
+      <button class="timer-toggle full-btn" onclick="toggleTimer()" id="timerToggleBtn">ACTIVATE COUNTDOWN</button>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="panel" style="animation-delay:0.3s">
+      <div class="panel-label">System Control</div>
+      <div class="ctrl-btns">
+        <button class="ctrl-btn" onclick="resetGame()">↺ RESET</button>
+        <button class="ctrl-btn danger" onclick="revealRule()">⚠ REVEAL</button>
+      </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="panel" style="animation-delay:0.35s;font-family:'Share Tech Mono',monospace;font-size:0.7rem;line-height:2;color:var(--muted)">
+      <div class="panel-label">Protocol</div>
+      <div>1. Enter any number to test it</div>
+      <div>2. Observe ACCEPTED / REJECTED</div>
+      <div>3. Find the pattern</div>
+      <div>4. Submit your hypothesis</div>
+      <div>5. Unlock the BLACK BOX</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  BLACK BOX – HIDDEN RULE ENGINE
+// ═══════════════════════════════════════════════
+
+// ─── RULE DEFINITIONS ───────────────────────────
+const RULES = {
+  easy: [
+    {
+      id: 'prime',
+      name: 'Prime Numbers',
+      desc: 'Numbers that are only divisible by 1 and themselves (and greater than 1)',
+      keywords: ['prime', 'primes', 'prime number'],
+      check: n => isPrime(n)
+    },
+    {
+      id: 'even_gt50',
+      name: 'Even Numbers Greater Than 50',
+      desc: 'Even numbers that are strictly greater than 50',
+      keywords: ['even', 'greater than 50', 'even greater', 'even and greater'],
+      check: n => n % 2 === 0 && n > 50
+    },
+    {
+      id: 'perfect_square',
+      name: 'Perfect Squares',
+      desc: 'Numbers that are perfect squares (0, 1, 4, 9, 16, 25, ...)',
+      keywords: ['perfect square', 'square', 'squared', 'perfect squares'],
+      check: n => n >= 0 && Math.sqrt(n) === Math.floor(Math.sqrt(n))
+    },
+  ],
+  medium: [
+    {
+      id: 'fibonacci',
+      name: 'Fibonacci Numbers',
+      desc: 'Numbers that appear in the Fibonacci sequence (0, 1, 1, 2, 3, 5, 8, 13, 21, ...)',
+      keywords: ['fibonacci', 'fib', 'fibonacci number', 'fibonacci sequence'],
+      check: n => isFibonacci(n)
+    },
+    {
+      id: 'div7',
+      name: 'Multiples of 7',
+      desc: 'Numbers that are exactly divisible by 7',
+      keywords: ['divisible by 7', 'multiple of 7', 'multiples of 7', 'div 7'],
+      check: n => n % 7 === 0
+    },
+    {
+      id: 'digit_sum_10',
+      name: 'Digit Sum Equals 10',
+      desc: 'Numbers whose individual digits sum to exactly 10',
+      keywords: ['digit sum', 'sum of digits', 'digits sum to 10', 'digit sum 10', 'digits equal 10'],
+      check: n => digitSum(Math.abs(n)) === 10
+    },
+  ],
+  hard: [
+    {
+      id: 'mult3_not9',
+      name: 'Multiples of 3 But Not 9',
+      desc: 'Numbers divisible by 3 but NOT divisible by 9',
+      keywords: ['multiple of 3 not 9', 'divisible by 3 not 9', 'mult 3 not 9', '3 but not 9'],
+      check: n => n % 3 === 0 && n % 9 !== 0
+    },
+    {
+      id: 'prime_palindrome',
+      name: 'Prime Palindromes',
+      desc: 'Numbers that are both prime AND a palindrome (reads same forwards and backwards)',
+      keywords: ['prime palindrome', 'palindrome prime', 'prime and palindrome'],
+      check: n => isPrime(n) && isPalindrome(n)
+    },
+    {
+      id: 'power_of_2',
+      name: 'Powers of 2',
+      desc: 'Numbers that are exact powers of 2 (1, 2, 4, 8, 16, 32, 64, ...)',
+      keywords: ['power of 2', 'powers of 2', 'two', '2^', 'binary power'],
+      check: n => n > 0 && (n & (n - 1)) === 0
+    }
+  ]
+};
+
+// ─── MATH HELPERS ───────────────────────────────
+function isPrime(n) {
+  if (n < 2) return false;
+  if (n < 4) return true;
+  if (n % 2 === 0 || n % 3 === 0) return false;
+  for (let i = 5; i * i <= n; i += 6)
+    if (n % i === 0 || n % (i + 2) === 0) return false;
+  return true;
+}
+
+function isFibonacci(n) {
+  if (n < 0) return false;
+  const perfect = x => { const s = Math.round(Math.sqrt(x)); return s * s === x; };
+  return perfect(5 * n * n + 4) || perfect(5 * n * n - 4);
+}
+
+function digitSum(n) {
+  return String(n).split('').reduce((s, d) => s + parseInt(d), 0);
+}
+
+function isPalindrome(n) {
+  const s = String(n);
+  return s === s.split('').reverse().join('');
+}
+
+// ─── AI MESSAGES ────────────────────────────────
+const AI_MESSAGES = {
+  accepted: [
+    "Interesting choice... this one passes.",
+    "Signal confirmed. Keep probing.",
+    "Affirmative. The pattern holds.",
+    "Correct classification detected.",
+    "This number... belongs.",
+  ],
+  rejected: [
+    "Rejected. Try a different approach.",
+    "Negative. The logic eludes you still.",
+    "This one does not comply with the rule.",
+    "Interesting attempt. But no.",
+    "Are you sure about that pattern?",
+    "Logic requires patience, operator.",
+  ],
+  closer: [
+    "You're getting closer.",
+    "The pattern is within reach.",
+    "Something is shifting... keep thinking.",
+  ],
+  analyzing: [
+    "Analyzing input sequence...",
+    "Processing against hidden criteria...",
+    "Consulting the black box...",
+    "Running classification protocol...",
+    "Evaluating numeric signature...",
+  ]
+};
+
+function randMsg(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ─── GAME STATE ─────────────────────────────────
+let state = {
+  rule: null,
+  history: [],
+  guessCount: 0,
+  testCount: 0,
+  acceptedCount: 0,
+  startTime: null,
+  elapsed: 0,
+  timerActive: false,
+  timerSeconds: 180,
+  timerRemaining: 180,
+  timerInterval: null,
+  clockInterval: null,
+  difficulty: 'easy',
+  won: false,
+};
+
+// ─── INIT ────────────────────────────────────────
+function init() {
+  const pool = RULES[state.difficulty];
+  state.rule = pool[Math.floor(Math.random() * pool.length)];
+  state.history = [];
+  state.guessCount = 0;
+  state.testCount = 0;
+  state.acceptedCount = 0;
+  state.startTime = Date.now();
+  state.won = false;
+  state.timerActive = false;
+  state.timerRemaining = state.timerSeconds;
+
+  // clear intervals
+  clearInterval(state.clockInterval);
+  clearInterval(state.timerInterval);
+
+  // start elapsed clock
+  state.clockInterval = setInterval(updateClock, 1000);
+
+  // reset UI
+  document.getElementById('historyList').innerHTML =
+    `<div class="empty-history" id="emptyHistory">No tests performed yet.<br>Begin your investigation.</div>`;
+  document.getElementById('resultText').textContent = '─';
+  document.getElementById('resultText').className = 'result-text';
+  document.getElementById('aiMsg').textContent = 'Awaiting input from operator...';
+  document.getElementById('aiMsg').className = 'ai-msg';
+  document.getElementById('guessFeedback').textContent = 'Your hypothesis will be evaluated here...';
+  document.getElementById('numInput').value = '';
+  document.getElementById('guessInput').value = '';
+  document.getElementById('timerDisplay').textContent = 'OFF';
+  document.getElementById('timerDisplay').className = 'timer-display';
+  document.getElementById('timerToggleBtn').textContent = 'ACTIVATE COUNTDOWN';
+  document.getElementById('victory-overlay').classList.remove('show');
+
+  updateStats();
+  console.log('[DEBUG] Active rule:', state.rule.name); // hint in console for demo
+}
+
+// ─── TEST A NUMBER ───────────────────────────────
+function testNumber() {
+  const val = document.getElementById('numInput').value.trim();
+  if (val === '') return;
+  const n = parseInt(val);
+  if (isNaN(n)) { flashAI('Invalid number. Enter an integer.'); return; }
+
+  const btn = document.getElementById('testBtn');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  // show analyzing
+  const resultEl = document.getElementById('resultText');
+  resultEl.className = 'result-text analyzing show';
+  resultEl.textContent = randMsg(AI_MESSAGES.analyzing);
+  document.getElementById('aiMsg').textContent = '';
+
+  // delay for effect
+  const delay = 900 + Math.random() * 600;
+  setTimeout(() => {
+    const accepted = state.rule.check(n);
+    const item = { n, accepted };
+
+    state.testCount++;
+    if (accepted) state.acceptedCount++;
+    if (!state.history.some(h => h.n === n)) state.history.push(item);
+
+    // show result
+    resultEl.className = `result-text ${accepted ? 'accepted' : 'rejected'} show`;
+    resultEl.textContent = accepted ? '✓ ACCEPTED' : '✗ REJECTED';
+
+    // ai message
+    const msgs = accepted ? AI_MESSAGES.accepted : AI_MESSAGES.rejected;
+    const aiEl = document.getElementById('aiMsg');
+    aiEl.textContent = randMsg(msgs);
+    aiEl.className = accepted ? 'ai-msg glow' : 'ai-msg';
+
+    // flash
+    flashScreen(accepted);
+
+    // play sound
+    playSound(accepted);
+
+    // animate black box
+    animateBox(accepted);
+
+    // add to history
+    addHistoryItem(n, accepted);
+
+    // update stats
+    state.startTime = state.startTime || Date.now();
+    updateStats();
+
+    btn.disabled = false;
+    btn.textContent = '▶ TEST';
+  }, delay);
+}
+
+// ─── HISTORY ────────────────────────────────────
+function addHistoryItem(n, accepted) {
+  const list = document.getElementById('historyList');
+  const empty = document.getElementById('emptyHistory');
+  if (empty) empty.remove();
+
+  const div = document.createElement('div');
+  div.className = `history-item ${accepted ? 'acc' : 'rej'}`;
+  div.innerHTML = `
+    <span class="history-num">${n}</span>
+    <span class="history-badge ${accepted ? 'badge-acc' : 'badge-rej'}">${accepted ? 'ACCEPTED' : 'REJECTED'}</span>
+  `;
+  list.prepend(div);
+}
+
+// ─── GUESS ──────────────────────────────────────
+function submitGuess() {
+  const val = document.getElementById('guessInput').value.trim().toLowerCase();
+  if (!val) return;
+
+  state.guessCount++;
+  const feedEl = document.getElementById('guessFeedback');
+
+  // check if matches
+  const correct = state.rule.keywords.some(kw => val.includes(kw));
+
+  if (correct) {
+    feedEl.style.color = 'var(--accept)';
+    feedEl.textContent = '✓ HYPOTHESIS CONFIRMED';
+    victory();
+  } else {
+    const wrongResponses = [
+      `"${val}" — Incorrect. The pattern remains hidden.`,
+      `Negative. That does not match the classified rule.`,
+      `Almost... but not quite. Think deeper, operator.`,
+      `Hypothesis rejected. Recalibrate your logic.`,
+      `The black box remains sealed. Try again.`,
+    ];
+    feedEl.style.color = 'var(--reject)';
+    feedEl.textContent = randMsg(wrongResponses);
+    // Shake
+    feedEl.style.animation = 'none';
+    setTimeout(() => feedEl.style.animation = '', 50);
+  }
+
+  updateStats();
+}
+
+// ─── VICTORY ─────────────────────────────────────
+function victory() {
+  state.won = true;
+  clearInterval(state.clockInterval);
+  clearInterval(state.timerInterval);
+
+  const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+
+  document.getElementById('victory-rule-text').textContent =
+    `"${state.rule.name}" — ${state.rule.desc}`;
+  document.getElementById('victory-stats').textContent =
+    `${state.testCount} tests • ${state.guessCount} guess attempts • ${m}:${String(s).padStart(2,'0')} elapsed`;
+
+  document.getElementById('victory-overlay').classList.add('show');
+  startConfetti();
+}
+
+function closeVictory() {
+  stopConfetti();
+  document.getElementById('victory-overlay').classList.remove('show');
+  resetGame();
+}
+
+// ─── REVEAL ──────────────────────────────────────
+function revealRule() {
+  const feedEl = document.getElementById('guessFeedback');
+  feedEl.style.color = 'var(--accent)';
+  feedEl.textContent = `⚠ DECLASSIFIED: "${state.rule.name}" — ${state.rule.desc}`;
+}
+
+// ─── RESET ───────────────────────────────────────
+function resetGame() {
+  stopConfetti();
+  init();
+}
+
+// ─── DIFFICULTY ──────────────────────────────────
+function setDifficulty(diff) {
+  state.difficulty = diff;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`d-${diff}`).classList.add('active');
+  resetGame();
+}
+
+// ─── TIMER ───────────────────────────────────────
+let timerOn = false;
+function toggleTimer() {
+  timerOn = !timerOn;
+  if (timerOn) {
+    state.timerRemaining = state.timerSeconds;
+    document.getElementById('timerToggleBtn').textContent = 'DEACTIVATE';
+    startCountdown();
+  } else {
+    clearInterval(state.timerInterval);
+    document.getElementById('timerDisplay').textContent = 'OFF';
+    document.getElementById('timerDisplay').className = 'timer-display';
+    document.getElementById('timerToggleBtn').textContent = 'ACTIVATE COUNTDOWN';
+  }
+}
+
+function startCountdown() {
+  clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(() => {
+    state.timerRemaining--;
+    const m = Math.floor(state.timerRemaining / 60);
+    const s = state.timerRemaining % 60;
+    const el = document.getElementById('timerDisplay');
+    el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    el.className = state.timerRemaining <= 10 ? 'timer-display danger'
+                 : state.timerRemaining <= 30 ? 'timer-display warning'
+                 : 'timer-display';
+    if (state.timerRemaining <= 0) {
+      clearInterval(state.timerInterval);
+      timerOn = false;
+      el.textContent = 'TIME UP';
+      revealRule();
+      document.getElementById('timerToggleBtn').textContent = 'ACTIVATE COUNTDOWN';
+    }
+  }, 1000);
+}
+
+// ─── STATS ────────────────────────────────────────
+function updateClock() {
+  if (!state.startTime || state.won) return;
+  const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  document.getElementById('stat-time').textContent = `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function updateStats() {
+  document.getElementById('stat-tests').textContent = state.testCount;
+  document.getElementById('stat-guesses').textContent = state.guessCount;
+  const acc = state.testCount > 0
+    ? Math.round((state.acceptedCount / state.testCount) * 100) + '%'
+    : '–';
+  document.getElementById('stat-acc').textContent = acc;
+}
+
+// ─── ANIMATIONS & EFFECTS ───────────────────────
+function animateBox(accepted) {
+  const box = document.getElementById('blackBox');
+  box.style.borderColor = accepted ? 'var(--accept)' : 'var(--reject)';
+  box.style.boxShadow = accepted
+    ? '0 0 40px rgba(0,255,136,0.8), 0 0 80px rgba(0,255,136,0.3)'
+    : '0 0 40px rgba(255,34,68,0.8), 0 0 80px rgba(255,34,68,0.3)';
+  setTimeout(() => {
+    box.style.borderColor = '';
+    box.style.boxShadow = '';
+  }, 800);
+}
+
+function boxClick() {
+  const box = document.getElementById('blackBox');
+  box.style.transform = 'scale(0.95)';
+  setTimeout(() => box.style.transform = '', 150);
+}
+
+function flashScreen(accepted) {
+  const el = document.getElementById(accepted ? 'flash-green' : 'flash-red');
+  el.classList.add('active');
+  setTimeout(() => el.classList.remove('active'), 300);
+}
+
+function flashAI(msg) {
+  const el = document.getElementById('aiMsg');
+  el.textContent = msg;
+  el.className = 'ai-msg glow';
+}
+
+// ─── SOUND EFFECTS (Web Audio API) ──────────────
+let audioCtx;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playSound(accepted) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (accepted) {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    } else {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+    }
+  } catch(e) {}
+}
+
+// ─── CONFETTI ────────────────────────────────────
+let confettiAnim;
+function startConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx2 = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = Array.from({length: 120}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    r: 4 + Math.random() * 6,
+    color: ['#0ff','#0f8','#f0f','#ff0','#0ff8'][Math.floor(Math.random()*5)],
+    speed: 2 + Math.random() * 4,
+    drift: (Math.random() - 0.5) * 2,
+    rot: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.15,
+  }));
+
+  function draw() {
+    ctx2.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.y += p.speed;
+      p.x += p.drift;
+      p.rot += p.rotSpeed;
+      if (p.y > canvas.height + 10) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
+      ctx2.save();
+      ctx2.translate(p.x, p.y);
+      ctx2.rotate(p.rot);
+      ctx2.fillStyle = p.color;
+      ctx2.shadowColor = p.color;
+      ctx2.shadowBlur = 8;
+      ctx2.fillRect(-p.r/2, -p.r/2, p.r, p.r);
+      ctx2.restore();
+    });
+    confettiAnim = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopConfetti() {
+  cancelAnimationFrame(confettiAnim);
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ─── PARTICLES ───────────────────────────────────
+function spawnParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (8 + Math.random() * 15) + 's';
+    p.style.animationDelay = (Math.random() * 15) + 's';
+    p.style.background = Math.random() > 0.5 ? 'var(--accent)' : 'var(--accent2)';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    container.appendChild(p);
+  }
+}
+
+// ─── KEYBOARD ────────────────────────────────────
+document.getElementById('numInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') testNumber();
+});
+document.getElementById('guessInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitGuess();
+});
+
+// ─── BOOT ────────────────────────────────────────
+spawnParticles();
+init();
+</script>
+</body>
+</html>

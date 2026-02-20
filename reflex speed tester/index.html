@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REFLEX — Speed Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --panel: #0f0f1a;
+    --accent: #00ffaa;
+    --danger: #ff2244;
+    --warn: #ffcc00;
+    --text: #e8e8f0;
+    --muted: #444466;
+    --glow: 0 0 20px #00ffaa66;
+    --glow-red: 0 0 20px #ff224466;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* Grid background */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,170,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,170,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 520px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 12vw, 80px);
+    letter-spacing: 12px;
+    color: var(--accent);
+    text-shadow: var(--glow), 0 0 60px #00ffaa44;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: -16px;
+  }
+
+  /* Stats row */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: 100%;
+  }
+
+  .stat-box {
+    background: var(--panel);
+    border: 1px solid #1a1a2e;
+    padding: 14px 10px;
+    text-align: center;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+
+  .stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-shadow: var(--glow);
+  }
+
+  .stat-value.best { color: var(--warn); text-shadow: 0 0 20px #ffcc0066; }
+
+  /* Main arena */
+  #arena {
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 340px;
+    background: var(--panel);
+    border: 1px solid #1a1a2e;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+    transition: border-color 0.2s;
+  }
+
+  #arena::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid transparent;
+    clip-path: inherit;
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  #arena.waiting { border-color: #1a1a2e; }
+  #arena.ready { border-color: var(--danger); box-shadow: var(--glow-red), inset 0 0 60px #ff224411; }
+  #arena.go { border-color: var(--accent); box-shadow: var(--glow), inset 0 0 60px #00ffaa11; }
+  #arena.early { border-color: var(--danger); box-shadow: var(--glow-red), inset 0 0 80px #ff224422; }
+
+  .arena-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--panel);
+    transition: background 0.3s;
+  }
+
+  #arena.ready .arena-bg { background: #1a0008; }
+  #arena.go .arena-bg { background: #001a10; }
+  #arena.early .arena-bg { background: #1a000a; }
+
+  .arena-message {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    z-index: 2;
+  }
+
+  .arena-main-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 10vw, 56px);
+    letter-spacing: 6px;
+    transition: color 0.2s;
+    text-align: center;
+  }
+
+  .arena-sub-text {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 0 20px;
+    line-height: 1.8;
+  }
+
+  /* Result display */
+  .result-ms {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 16vw, 96px);
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    line-height: 1;
+    text-align: center;
+  }
+
+  .result-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .rating {
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 4px 12px;
+    border: 1px solid currentColor;
+    text-transform: uppercase;
+  }
+
+  /* Pulsing dot indicator */
+  .dot-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    opacity: 0;
+    transform: scale(0.5);
+    pointer-events: none;
+  }
+
+  /* Crosshair in idle */
+  .crosshair {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  .crosshair-h, .crosshair-v {
+    position: absolute;
+    background: var(--accent);
+  }
+
+  .crosshair-h { width: 60px; height: 1px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .crosshair-v { width: 1px; height: 60px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .crosshair-circle {
+    position: absolute;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* History bar */
+  .history {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+    height: 40px;
+    width: 100%;
+  }
+
+  .history-bar {
+    flex: 1;
+    background: var(--muted);
+    border-radius: 2px 2px 0 0;
+    min-height: 4px;
+    transition: background 0.3s;
+    position: relative;
+  }
+
+  .history-bar.best-bar { background: var(--warn); }
+  .history-bar.current-bar { background: var(--accent); }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 12px; width: 100%; }
+
+  .btn {
+    flex: 1;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    cursor: pointer;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    transition: all 0.2s;
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { border-color: var(--accent); color: var(--accent); }
+  .btn.primary:hover { background: rgba(0,255,170,0.1); box-shadow: var(--glow); }
+
+  /* Countdown ring animation */
+  @keyframes pulse-ring {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+  }
+
+  @keyframes flash-in {
+    0% { opacity: 0; transform: scale(1.3); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .go-flash { animation: flash-in 0.15s ease-out forwards; }
+  .early-shake {
+    animation: shake 0.4s ease-out;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+
+  /* Heartbeat pulse ring */
+  .pulse-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 80px; height: 80px;
+    margin: -40px 0 0 -40px;
+    border-radius: 50%;
+    border: 2px solid var(--danger);
+    opacity: 0;
+    pointer-events: none;
+    animation: none;
+  }
+
+  @keyframes heartbeat-ring {
+    0%   { transform: scale(0.4); opacity: 0.9; }
+    100% { transform: scale(2.4); opacity: 0; }
+  }
+
+  .pulse-ring.beat {
+    animation: heartbeat-ring 0.5s ease-out forwards;
+  }
+
+  /* Tension bar at top of arena */
+  .tension-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 5;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .tension-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff224400, #ff2244, #ff224400);
+    transition: none;
+  }
+
+  /* Go burst overlay */
+  @keyframes go-burst {
+    0%   { opacity: 0.5; transform: scale(0.8); }
+    60%  { opacity: 0.15; transform: scale(1.2); }
+    100% { opacity: 0; transform: scale(1.5); }
+  }
+
+  .go-burst {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, #00ffaa44 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1;
+  }
+
+  .go-burst.active {
+    animation: go-burst 0.5s ease-out forwards;
+  }
+
+  /* Screen flash for early */
+  @keyframes error-flash {
+    0%   { opacity: 0.35; }
+    100% { opacity: 0; }
+  }
+
+  .error-overlay {
+    position: fixed;
+    inset: 0;
+    background: #ff2244;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  .error-overlay.flash {
+    animation: error-flash 0.3s ease-out forwards;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div>
+    <div class="title">REFLEX</div>
+    <div class="subtitle">// reaction speed test //</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box">
+      <div class="stat-label">Last</div>
+      <div class="stat-value" id="stat-last">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Best</div>
+      <div class="stat-value best" id="stat-best">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Avg</div>
+      <div class="stat-value" id="stat-avg">—</div>
+    </div>
+  </div>
+
+  <div id="arena" class="waiting" onclick="handleClick()">
+    <div class="arena-bg"></div>
+    <div class="tension-bar"><div class="tension-fill" id="tension-fill"></div></div>
+    <div class="go-burst" id="go-burst"></div>
+    <div class="pulse-ring" id="pulse-ring"></div>
+    <div class="crosshair">
+      <div class="crosshair-h"></div>
+      <div class="crosshair-v"></div>
+      <div class="crosshair-circle"></div>
+    </div>
+    <div class="arena-message" id="arena-msg">
+      <div class="arena-main-text" id="main-text" style="color: var(--muted)">CLICK TO START</div>
+      <div class="arena-sub-text" id="sub-text">test your reaction time<br>click when it turns green</div>
+    </div>
+  </div>
+
+  <div class="error-overlay" id="error-overlay"></div>
+
+  <div class="history" id="history"></div>
+
+  <div class="btn-row">
+    <button class="btn primary" onclick="startGame()">[ NEW TEST ]</button>
+    <button class="btn" onclick="resetStats()">[ RESET ]</button>
+  </div>
+</div>
+
+<script>
+  let state = 'idle';
+  let startTime = null;
+  let timeout = null;
+  let heartbeatInterval = null;
+  let tensionInterval = null;
+  let tensionStart = null;
+  let tensionDuration = null;
+  let results = [];
+
+  const arena = document.getElementById('arena');
+  const mainText = document.getElementById('main-text');
+  const subText = document.getElementById('sub-text');
+  const statLast = document.getElementById('stat-last');
+  const statBest = document.getElementById('stat-best');
+  const statAvg = document.getElementById('stat-avg');
+  const historyEl = document.getElementById('history');
+  const pulseRing = document.getElementById('pulse-ring');
+  const goBurst = document.getElementById('go-burst');
+  const errorOverlay = document.getElementById('error-overlay');
+  const tensionFill = document.getElementById('tension-fill');
+
+  // ── Audio Engine ──────────────────────────────────────────────
+  let audioCtx = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playTone({ type = 'sine', freq = 440, endFreq, gain = 0.25, attack = 0.005, decay = 0.15, start = 0 }) {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+    if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + start + decay);
+    gainNode.gain.setValueAtTime(0, ctx.currentTime + start);
+    gainNode.gain.linearRampToValueAtTime(gain, ctx.currentTime + start + attack);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + decay);
+    osc.start(ctx.currentTime + start);
+    osc.stop(ctx.currentTime + start + decay + 0.05);
+  }
+
+  function playNoise({ gain = 0.1, decay = 0.12, start = 0, freq = 800 }) {
+    const ctx = getAudioCtx();
+    const bufSize = ctx.sampleRate * (decay + 0.05);
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = freq;
+    filter.Q.value = 0.5;
+    const gainNode = ctx.createGain();
+    src.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    gainNode.gain.setValueAtTime(gain, ctx.currentTime + start);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + decay);
+    src.start(ctx.currentTime + start);
+    src.stop(ctx.currentTime + start + decay + 0.05);
+  }
+
+  // Heartbeat "thud-thud" with increasing urgency
+  function playHeartbeat(intensity = 1) {
+    const vol = Math.min(0.18 * intensity, 0.35);
+    // Thud 1
+    playTone({ type: 'sine', freq: 80, endFreq: 35, gain: vol, decay: 0.18 });
+    playNoise({ gain: vol * 0.3, decay: 0.08, freq: 120 });
+    // Thud 2 slightly lighter
+    setTimeout(() => {
+      playTone({ type: 'sine', freq: 70, endFreq: 30, gain: vol * 0.7, decay: 0.14 });
+      playNoise({ gain: vol * 0.2, decay: 0.06, freq: 100 });
+    }, 160);
+  }
+
+  function sfxStart() {
+    // Low tension drone + click
+    playTone({ type: 'sawtooth', freq: 110, endFreq: 100, gain: 0.06, decay: 0.6 });
+    playTone({ type: 'square', freq: 440, gain: 0.04, decay: 0.05 });
+  }
+
+  function sfxGo() {
+    // Sharp upward electronic blip
+    playTone({ type: 'square', freq: 300, endFreq: 1200, gain: 0.22, attack: 0.001, decay: 0.08 });
+    playTone({ type: 'sine', freq: 800, endFreq: 1600, gain: 0.18, attack: 0.001, decay: 0.12, start: 0.04 });
+    playNoise({ gain: 0.1, decay: 0.06, freq: 2000, start: 0 });
+  }
+
+  function sfxEarly() {
+    // Harsh buzz descending
+    playTone({ type: 'sawtooth', freq: 280, endFreq: 60, gain: 0.28, decay: 0.35 });
+    playNoise({ gain: 0.15, decay: 0.25, freq: 200 });
+    playTone({ type: 'square', freq: 120, endFreq: 50, gain: 0.12, decay: 0.4, start: 0.05 });
+  }
+
+  function sfxResult(ms) {
+    // Rating-based chime — faster = higher, sweeter
+    const quality = Math.max(0, Math.min(1, (500 - ms) / 350));
+    const baseFreq = 400 + quality * 800;
+    playTone({ type: 'sine', freq: baseFreq, endFreq: baseFreq * 1.5, gain: 0.15, decay: 0.25 });
+    playTone({ type: 'sine', freq: baseFreq * 1.25, gain: 0.1, decay: 0.35, start: 0.06 });
+    if (ms < 250) {
+      playTone({ type: 'sine', freq: baseFreq * 2, gain: 0.08, decay: 0.3, start: 0.12 });
+    }
+  }
+
+  // ── Heartbeat system ──────────────────────────────────────────
+  let heartbeatSpeed = 1000;
+
+  function triggerPulse() {
+    pulseRing.classList.remove('beat');
+    void pulseRing.offsetWidth; // reflow
+    pulseRing.classList.add('beat');
+  }
+
+  function startHeartbeat(totalDelay) {
+    stopHeartbeat();
+    let elapsed = 0;
+    let beatCount = 0;
+    // Starts slow (~1/s), accelerates toward the end
+    function scheduleBeat() {
+      if (state !== 'waiting') return;
+      const progress = Math.min(elapsed / totalDelay, 0.95);
+      // interval from 1100ms → 300ms
+      const interval = 1100 - progress * 800;
+      const intensity = 1 + progress * 1.5;
+      heartbeatInterval = setTimeout(() => {
+        if (state !== 'waiting') return;
+        triggerPulse();
+        playHeartbeat(intensity);
+        elapsed += interval;
+        beatCount++;
+        scheduleBeat();
+      }, interval);
+    }
+    scheduleBeat();
+  }
+
+  function stopHeartbeat() {
+    clearTimeout(heartbeatInterval);
+    heartbeatInterval = null;
+    pulseRing.classList.remove('beat');
+  }
+
+  // ── Tension bar ───────────────────────────────────────────────
+  function startTensionBar(duration) {
+    tensionStart = performance.now();
+    tensionDuration = duration;
+    tensionFill.style.transition = 'none';
+    tensionFill.style.width = '0%';
+    function animate() {
+      if (state !== 'waiting') return;
+      const pct = Math.min(((performance.now() - tensionStart) / tensionDuration) * 100, 100);
+      tensionFill.style.width = pct + '%';
+      // Color shifts from dim red → bright red as tension builds
+      const alpha = 0.3 + (pct / 100) * 0.7;
+      tensionFill.style.background = `linear-gradient(90deg, transparent, rgba(255,34,68,${alpha}), transparent)`;
+      if (pct < 100) requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  }
+
+  function stopTensionBar() {
+    tensionFill.style.width = '0%';
+  }
+
+  // ── Game logic ────────────────────────────────────────────────
+  function getRating(ms) {
+    if (ms < 150) return ['SUPERHUMAN', '#00ffff'];
+    if (ms < 200) return ['ELITE', '#00ffaa'];
+    if (ms < 250) return ['FAST', '#44ff88'];
+    if (ms < 300) return ['GOOD', '#aaff44'];
+    if (ms < 400) return ['AVERAGE', '#ffcc00'];
+    if (ms < 500) return ['SLOW', '#ff8844'];
+    return ['SLUGGISH', '#ff2244'];
+  }
+
+  function startGame() {
+    clearTimeout(timeout);
+    stopHeartbeat();
+    stopTensionBar();
+    state = 'waiting';
+    arena.className = 'ready';
+    mainText.style.color = 'var(--danger)';
+    mainText.textContent = 'WAIT...';
+    mainText.classList.remove('go-flash', 'early-shake');
+    subText.textContent = 'hold on... not yet!';
+    sfxStart();
+
+    const delay = 1500 + Math.random() * 3000;
+    startHeartbeat(delay);
+    startTensionBar(delay);
+    timeout = setTimeout(showGo, delay);
+  }
+
+  function showGo() {
+    stopHeartbeat();
+    stopTensionBar();
+    tensionFill.style.width = '100%';
+    tensionFill.style.background = 'linear-gradient(90deg, transparent, #00ffaa, transparent)';
+    state = 'go';
+    arena.className = 'go';
+    mainText.style.color = 'var(--accent)';
+    mainText.textContent = 'CLICK NOW!';
+    mainText.classList.add('go-flash');
+    subText.textContent = '';
+
+    // Go burst visual
+    goBurst.classList.remove('active');
+    void goBurst.offsetWidth;
+    goBurst.classList.add('active');
+
+    sfxGo();
+    startTime = performance.now();
+  }
+
+  function handleClick() {
+    if (state === 'idle') {
+      startGame();
+    } else if (state === 'waiting') {
+      clearTimeout(timeout);
+      stopHeartbeat();
+      stopTensionBar();
+      state = 'idle';
+      arena.className = 'early';
+      mainText.style.color = 'var(--danger)';
+      mainText.textContent = 'TOO EARLY!';
+      mainText.classList.remove('go-flash');
+      mainText.classList.add('early-shake');
+      subText.textContent = 'wait for green\nclick to try again';
+
+      // Screen flash + sfx
+      errorOverlay.classList.remove('flash');
+      void errorOverlay.offsetWidth;
+      errorOverlay.classList.add('flash');
+      sfxEarly();
+      tensionFill.style.width = '0%';
+    } else if (state === 'go') {
+      const elapsed = performance.now() - startTime;
+      const ms = Math.round(elapsed);
+      recordResult(ms);
+    }
+  }
+
+  function recordResult(ms) {
+    state = 'result';
+    results.push(ms);
+
+    const best = Math.min(...results);
+    const avg = Math.round(results.reduce((a, b) => a + b, 0) / results.length);
+    const [rating, ratingColor] = getRating(ms);
+
+    statLast.textContent = ms + 'ms';
+    statBest.textContent = best + 'ms';
+    statAvg.textContent = avg + 'ms';
+
+    arena.className = 'go';
+    mainText.style.color = 'var(--accent)';
+    mainText.textContent = ms + 'ms';
+    mainText.classList.remove('go-flash');
+    subText.innerHTML = `<span style="color:${ratingColor};letter-spacing:3px;border:1px solid ${ratingColor};padding:2px 8px">${rating}</span><br><br>click to test again`;
+
+    sfxResult(ms);
+    updateHistory(best);
+    tensionFill.style.width = '0%';
+    state = 'idle';
+  }
+
+  function updateHistory(bestMs) {
+    const max = Math.max(...results, 500);
+    historyEl.innerHTML = '';
+    const show = results.slice(-12);
+    show.forEach(r => {
+      const bar = document.createElement('div');
+      bar.className = 'history-bar';
+      const pct = Math.max(8, (r / max) * 100);
+      bar.style.height = pct + '%';
+      if (r === Math.min(...results)) bar.classList.add('best-bar');
+      if (r === results[results.length - 1]) bar.classList.add('current-bar');
+      bar.title = r + 'ms';
+      historyEl.appendChild(bar);
+    });
+  }
+
+  function resetStats() {
+    results = [];
+    state = 'idle';
+    clearTimeout(timeout);
+    stopHeartbeat();
+    stopTensionBar();
+    arena.className = 'waiting';
+    mainText.style.color = 'var(--muted)';
+    mainText.textContent = 'CLICK TO START';
+    mainText.classList.remove('go-flash', 'early-shake');
+    subText.textContent = 'test your reaction time\nclick when it turns green';
+    statLast.textContent = '—';
+    statBest.textContent = '—';
+    statAvg.textContent = '—';
+    historyEl.innerHTML = '';
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      handleClick();
+    }
+  });
+</script>
+</body>
+</html>
