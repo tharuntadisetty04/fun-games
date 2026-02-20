@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whac-A-Mole</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Titan+One&family=Nunito:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="sun"></div>
+    <div
+      class="cloud"
+      style="
+        width: 130px;
+        height: 44px;
+        top: 7%;
+        animation-duration: 30s;
+        animation-delay: -4s;
+      "
+    ></div>
+    <div
+      class="cloud"
+      style="
+        width: 85px;
+        height: 30px;
+        top: 15%;
+        animation-duration: 24s;
+        animation-delay: -14s;
+      "
+    ></div>
+    <div
+      class="cloud"
+      style="
+        width: 110px;
+        height: 38px;
+        top: 4%;
+        animation-duration: 38s;
+        animation-delay: -22s;
+      "
+    ></div>
+
+    <div class="overlay" id="overlay">
+      <div class="ol-card">
+        <div class="ol-emoji" id="ol-emoji">🔨</div>
+        <div class="ol-title" id="ol-title">WHAC-A-MOLE</div>
+        <div class="ol-score-block" id="ol-score-block" style="display: none">
+          <div class="ol-score" id="ol-score"></div>
+          <div class="ol-score-lbl">POINTS</div>
+        </div>
+        <div class="ol-best" id="ol-best" style="display: none"></div>
+        <div class="ol-divider"></div>
+        <div class="mole-legend">
+          <div class="mole-legend-item">
+            <span class="leg-icon">🐹</span>
+            1 pt
+          </div>
+          <div class="mole-legend-item leg-hat">
+            <span class="leg-icon">🐭</span>
+            2 pts
+          </div>
+          <div class="mole-legend-item leg-gold">
+            <span class="leg-icon">👑</span>
+            3 pts
+          </div>
+        </div>
+        <div class="ol-divider"></div>
+        <div class="ol-diff-row">
+          <button class="ol-diff-btn active" data-diff="easy">Easy</button>
+          <button class="ol-diff-btn" data-diff="medium">Medium</button>
+          <button class="ol-diff-btn" data-diff="hard">Hard</button>
+        </div>
+        <button class="ol-play-btn" id="ol-play">▶ PLAY</button>
+      </div>
+    </div>
+
+    <div class="title">🔨Whac-A-Mole</div>
+
+    <div class="hud">
+      <div class="hud-card">
+        <div class="lbl">Score</div>
+        <div class="val" id="score-val">0</div>
+      </div>
+      <div class="hud-card">
+        <div class="lbl">Time</div>
+        <div class="val" id="timer-val">30</div>
+      </div>
+      <div class="hud-card">
+        <div class="lbl">Best</div>
+        <div class="val" id="best-val" style="color: #f57c00">0</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <div class="controls">
+      <div class="diff-row">
+        <button class="diff-btn active" data-diff="easy">Easy</button>
+        <button class="diff-btn" data-diff="medium">Medium</button>
+        <button class="diff-btn" data-diff="hard">Hard</button>
+      </div>
+      <button class="start-btn" id="start-btn">▶ START</button>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
