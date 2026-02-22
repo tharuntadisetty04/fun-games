@@ -5,786 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>777 Lucky Slots</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap"
       rel="stylesheet"
     />
-    <style>
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      :root {
-        --gold: #ffd700;
-        --gold-dark: #b8860b;
-        --bg-dark: #0a0a0f;
-        --accent: #ff4500;
-        --green: #00ff88;
-        --neon-gold: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 40px #b8860b;
-      }
-
-      body {
-        background: #0a0008;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: "Rajdhani", sans-serif;
-        overflow: hidden;
-        position: relative;
-      }
-
-      /* ── Layer 1: deep casino felt base ── */
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        background:
-      /* spotlight halo directly behind machine */
-          radial-gradient(
-            ellipse 60% 55% at 50% 48%,
-            rgba(120, 60, 0, 0.38) 0%,
-            transparent 70%
-          ),
-          /* deep red casino glow from below */
-          radial-gradient(
-              ellipse 90% 40% at 50% 100%,
-              rgba(160, 10, 10, 0.45) 0%,
-              transparent 65%
-            ),
-          /* left amber wall sconce */
-          radial-gradient(
-              ellipse 35% 60% at 5% 50%,
-              rgba(180, 90, 0, 0.22) 0%,
-              transparent 70%
-            ),
-          /* right amber wall sconce */
-          radial-gradient(
-              ellipse 35% 60% at 95% 50%,
-              rgba(180, 90, 0, 0.22) 0%,
-              transparent 70%
-            ),
-          /* top neon bleed */
-          radial-gradient(
-              ellipse 70% 30% at 50% 0%,
-              rgba(100, 40, 0, 0.3) 0%,
-              transparent 70%
-            ),
-          /* base colour — very dark maroon-black */
-          linear-gradient(
-              160deg,
-              #0f0508 0%,
-              #080308 40%,
-              #0a0205 70%,
-              #060106 100%
-            );
-        pointer-events: none;
-      }
-
-      /* ── Layer 2: felt diamond/noise texture via repeating pattern ── */
-      body::after {
-        content: "";
-        position: fixed;
-        inset: 0;
-        z-index: 1;
-        background-image:
-      /* subtle diagonal felt weave */
-          repeating-linear-gradient(
-            45deg,
-            transparent 0px,
-            transparent 3px,
-            rgba(255, 255, 255, 0.012) 3px,
-            rgba(255, 255, 255, 0.012) 4px
-          ),
-          repeating-linear-gradient(
-            -45deg,
-            transparent 0px,
-            transparent 3px,
-            rgba(255, 255, 255, 0.008) 3px,
-            rgba(255, 255, 255, 0.008) 4px
-          ),
-          /* scanlines */
-          repeating-linear-gradient(
-              0deg,
-              transparent,
-              transparent 2px,
-              rgba(0, 0, 0, 0.06) 2px,
-              rgba(0, 0, 0, 0.06) 4px
-            );
-        pointer-events: none;
-      }
-
-      /* ── Layer 3: animated floating ember/dust particles (canvas) ── */
-      #bg-canvas {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 2;
-      }
-
-      /* ── Layer 4: vignette frame to pull focus inward ── */
-      .vignette {
-        position: fixed;
-        inset: 0;
-        z-index: 3;
-        pointer-events: none;
-        background: radial-gradient(
-          ellipse 85% 85% at 50% 50%,
-          transparent 40%,
-          rgba(4, 1, 6, 0.55) 75%,
-          rgba(2, 0, 4, 0.88) 100%
-        );
-      }
-
-      #confetti-canvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 100;
-      }
-
-      /* ── outer layout ── */
-      .scene {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        align-items: stretch;
-      }
-
-      .machine-col {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      /* ── MARQUEE ── */
-      .marquee {
-        background: linear-gradient(180deg, #1a0a00, #2a1200);
-        border: 3px solid var(--gold-dark);
-        border-bottom: none;
-        border-radius: 20px 20px 0 0;
-        padding: 14px 60px 18px;
-        text-align: center;
-        box-shadow:
-          0 -6px 50px rgba(255, 140, 0, 0.45),
-          0 -2px 20px rgba(255, 100, 0, 0.3),
-          inset 0 1px 0 rgba(255, 215, 0, 0.15);
-      }
-      .marquee-lights {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 8px;
-      }
-      .marquee-light {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--gold);
-        box-shadow:
-          0 0 8px var(--gold),
-          0 0 16px var(--gold);
-        animation: blink 1s infinite;
-      }
-      .marquee-light:nth-child(2) {
-        animation-delay: 0.15s;
-      }
-      .marquee-light:nth-child(3) {
-        animation-delay: 0.3s;
-      }
-      .marquee-light:nth-child(4) {
-        animation-delay: 0.45s;
-      }
-      .marquee-light:nth-child(5) {
-        animation-delay: 0.6s;
-      }
-      .marquee-light:nth-child(6) {
-        animation-delay: 0.75s;
-      }
-      .marquee-light:nth-child(7) {
-        animation-delay: 0.9s;
-      }
-      @keyframes blink {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.15;
-        }
-      }
-
-      .marquee h1 {
-        font-family: "Cinzel Decorative", serif;
-        font-size: 2.6rem;
-        font-weight: 900;
-        color: var(--gold);
-        text-shadow: var(--neon-gold);
-        letter-spacing: 4px;
-        line-height: 1;
-      }
-      .marquee-sub {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 0.9rem;
-        color: var(--gold-dark);
-        letter-spacing: 8px;
-        margin-top: 3px;
-      }
-
-      /* ── MACHINE BODY ── */
-      .machine {
-        background: linear-gradient(
-          160deg,
-          #1c1c2e 0%,
-          #12121a 40%,
-          #0e0e1a 100%
-        );
-        border: 3px solid var(--gold-dark);
-        border-top: none;
-        border-bottom: none;
-        padding: 28px 36px;
-        position: relative;
-        width: 500px;
-        box-shadow:
-          inset 0 0 60px rgba(0, 0, 0, 0.5),
-          0 0 60px rgba(180, 100, 0, 0.25),
-          0 0 120px rgba(120, 60, 0, 0.18),
-          0 0 200px rgba(80, 30, 0, 0.12);
-      }
-      .rivet {
-        position: absolute;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 35% 35%, #ffd700, #8b6914);
-        box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
-      }
-      .rivet.tl {
-        top: 12px;
-        left: 12px;
-      }
-      .rivet.tr {
-        top: 12px;
-        right: 12px;
-      }
-      .rivet.bl {
-        bottom: 12px;
-        left: 12px;
-      }
-      .rivet.br {
-        bottom: 12px;
-        right: 12px;
-      }
-
-      /* ── REELS ── */
-      .reels-container {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        background: linear-gradient(180deg, #050508, #0d0d14);
-        border: 3px solid #2a2a40;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: inset 0 4px 30px rgba(0, 0, 0, 0.8);
-        position: relative;
-      }
-      .payline {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 80, 0, 0.5) 20%,
-          rgba(255, 80, 0, 0.8) 50%,
-          rgba(255, 80, 0, 0.5) 80%,
-          transparent
-        );
-        transform: translateY(-50%);
-        pointer-events: none;
-        z-index: 10;
-      }
-      .payline::before,
-      .payline::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 8px var(--accent);
-      }
-      .payline::before {
-        left: 10px;
-      }
-      .payline::after {
-        right: 10px;
-      }
-
-      .reel-slot {
-        width: 120px;
-        height: 120px;
-        border: 3px solid #3a3a5c;
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
-        background: #08080f;
-        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-      }
-      .reel-slot::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 35%;
-        background: linear-gradient(
-          180deg,
-          rgba(8, 8, 15, 1) 0%,
-          transparent 100%
-        );
-        z-index: 5;
-        pointer-events: none;
-      }
-      .reel-slot::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 35%;
-        background: linear-gradient(
-          0deg,
-          rgba(8, 8, 15, 1) 0%,
-          transparent 100%
-        );
-        z-index: 5;
-        pointer-events: none;
-      }
-      .reel-strip {
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        width: 100%;
-        will-change: transform;
-      }
-      .reel-symbol {
-        width: 120px;
-        height: 120px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3.4rem;
-        flex-shrink: 0;
-        user-select: none;
-      }
-      .reel-symbol.is-seven {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 4.2rem;
-        font-weight: 900;
-        color: #ffd700;
-        text-shadow:
-          0 0 10px #ffd700,
-          0 0 22px #ff8c00,
-          0 0 3px #fff;
-      }
-      .reel-slot.win-glow {
-        border-color: var(--gold);
-        animation: reelPulse 0.5s ease-in-out infinite alternate;
-      }
-      @keyframes reelPulse {
-        from {
-          box-shadow:
-            inset 0 0 20px rgba(255, 215, 0, 0.1),
-            0 0 20px rgba(255, 215, 0, 0.4);
-        }
-        to {
-          box-shadow:
-            inset 0 0 30px rgba(255, 215, 0, 0.2),
-            0 0 50px rgba(255, 215, 0, 0.7),
-            0 0 80px rgba(255, 165, 0, 0.3);
-        }
-      }
-
-      /* ── STATUS ── */
-      .status-area {
-        margin-top: 20px;
-        text-align: center;
-        height: 52px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .status-text {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 2.2rem;
-        letter-spacing: 4px;
-        color: #4a4a6a;
-        transition: all 0.3s;
-      }
-      .status-text.idle {
-        color: #4a4a6a;
-      }
-      .status-text.spinning {
-        color: var(--gold-dark);
-        animation: spinPulse 0.6s ease-in-out infinite alternate;
-      }
-      @keyframes spinPulse {
-        from {
-          opacity: 0.7;
-        }
-        to {
-          opacity: 1;
-          text-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
-        }
-      }
-      .status-text.win {
-        color: var(--gold);
-        text-shadow: var(--neon-gold);
-        font-size: 2.6rem;
-        animation: jackpotAnim 0.4s ease-in-out infinite alternate;
-      }
-      @keyframes jackpotAnim {
-        from {
-          transform: scale(1);
-          text-shadow: var(--neon-gold);
-        }
-        to {
-          transform: scale(1.07);
-          text-shadow:
-            0 0 20px #ffd700,
-            0 0 50px #ffd700,
-            0 0 100px #b8860b;
-        }
-      }
-      .status-text.lose {
-        color: #8a2020;
-        font-size: 2rem;
-      }
-
-      /* ── BOTTOM PANEL ── */
-      .bottom-panel {
-        background: linear-gradient(180deg, #12121a 0%, #0e0e16 100%);
-        border: 3px solid var(--gold-dark);
-        border-top: none;
-        border-radius: 0 0 20px 20px;
-        padding: 20px 36px 24px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 14px;
-        box-shadow:
-          0 20px 80px rgba(0, 0, 0, 0.7),
-          0 8px 40px rgba(150, 60, 0, 0.2);
-      }
-      .spin-btn {
-        width: 200px;
-        height: 60px;
-        border: none;
-        border-radius: 50px;
-        background: linear-gradient(
-          135deg,
-          #cc0000 0%,
-          #ff2200 40%,
-          #ff4400 60%,
-          #cc1100 100%
-        );
-        color: white;
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 1.7rem;
-        letter-spacing: 5px;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        box-shadow:
-          0 6px 20px rgba(200, 0, 0, 0.5),
-          0 2px 0 rgba(255, 255, 255, 0.1) inset,
-          0 -2px 0 rgba(0, 0, 0, 0.3) inset;
-        transition: all 0.15s;
-        outline: none;
-      }
-      .spin-btn::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 60%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.15),
-          transparent
-        );
-        transform: skewX(-20deg);
-        transition: left 0.5s;
-      }
-      .spin-btn:hover:not(:disabled)::before {
-        left: 150%;
-      }
-      .spin-btn:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow:
-          0 10px 30px rgba(200, 0, 0, 0.6),
-          0 0 40px rgba(255, 50, 0, 0.3),
-          0 2px 0 rgba(255, 255, 255, 0.1) inset;
-      }
-      .spin-btn:active:not(:disabled) {
-        transform: translateY(1px);
-        box-shadow: 0 2px 10px rgba(200, 0, 0, 0.4);
-      }
-      .spin-btn:disabled {
-        background: linear-gradient(135deg, #4a1a1a, #3a1010);
-        color: #7a3a3a;
-        cursor: not-allowed;
-        box-shadow: none;
-      }
-      .bottom-lights {
-        display: flex;
-        gap: 8px;
-      }
-      .bottom-light {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        animation: blink 1.2s infinite;
-      }
-      .bottom-light:nth-child(1) {
-        background: #ff2200;
-        box-shadow: 0 0 6px #ff2200;
-      }
-      .bottom-light:nth-child(2) {
-        background: var(--gold);
-        box-shadow: 0 0 6px var(--gold);
-        animation-delay: 0.2s;
-      }
-      .bottom-light:nth-child(3) {
-        background: var(--green);
-        box-shadow: 0 0 6px var(--green);
-        animation-delay: 0.4s;
-      }
-      .bottom-light:nth-child(4) {
-        background: #8888ff;
-        box-shadow: 0 0 6px #8888ff;
-        animation-delay: 0.6s;
-      }
-      .bottom-light:nth-child(5) {
-        background: var(--gold);
-        box-shadow: 0 0 6px var(--gold);
-        animation-delay: 0.8s;
-      }
-      .bottom-light:nth-child(6) {
-        background: #ff2200;
-        box-shadow: 0 0 6px #ff2200;
-        animation-delay: 1s;
-      }
-      .bottom-light:nth-child(7) {
-        background: var(--green);
-        box-shadow: 0 0 6px var(--green);
-        animation-delay: 1.2s;
-      }
-
-      /* ── WIN FLASH ── */
-      .win-flash {
-        position: fixed;
-        inset: 0;
-        background: radial-gradient(
-          ellipse at center,
-          rgba(255, 215, 0, 0.15),
-          transparent 70%
-        );
-        pointer-events: none;
-        z-index: 50;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-      .win-flash.active {
-        opacity: 1;
-        animation: flashPulse 0.45s ease-in-out 5;
-      }
-      @keyframes flashPulse {
-        0%,
-        100% {
-          opacity: 0;
-        }
-        50% {
-          opacity: 1;
-        }
-      }
-
-      /* ══════════════════════════════════════
-     LEVER SIDEBAR
-  ══════════════════════════════════════ */
-      .lever-col {
-        display: flex;
-        align-items: flex-start;
-        /* push lever down so it aligns with machine body, not marquee */
-      }
-
-      .lever-housing {
-        width: 68px;
-        background: linear-gradient(160deg, #1a1a2e, #101018);
-        border: 3px solid var(--gold-dark);
-        border-left: none;
-        border-radius: 0 18px 18px 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 18px 0 26px;
-        position: relative;
-        box-shadow:
-          6px 0 24px rgba(0, 0, 0, 0.5),
-          inset -4px 0 12px rgba(0, 0, 0, 0.3);
-        /* height will be set to match machine body + bottom panel by JS */
-      }
-
-      /* decorative side rivets */
-      .lever-housing::before,
-      .lever-housing::after {
-        content: "";
-        position: absolute;
-        right: 8px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 35% 35%, #ffd700, #8b6914);
-      }
-      .lever-housing::before {
-        top: 14px;
-      }
-      .lever-housing::after {
-        bottom: 14px;
-      }
-
-      /* track groove */
-      .lever-track {
-        width: 10px;
-        flex: 1;
-        background: linear-gradient(180deg, #030305, #080810);
-        border: 2px solid #222235;
-        border-radius: 5px;
-        position: relative;
-        box-shadow:
-          inset 0 2px 10px rgba(0, 0, 0, 0.9),
-          inset 0 0 4px rgba(0, 0, 0, 0.6);
-        overflow: visible;
-      }
-
-      /* the moving arm */
-      .lever-arm {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        cursor: pointer;
-        z-index: 4;
-        /* top is set by JS */
-      }
-      .lever-arm:hover .lever-ball {
-        box-shadow:
-          0 0 22px rgba(255, 60, 0, 0.9),
-          0 0 44px rgba(200, 0, 0, 0.6),
-          inset 0 3px 8px rgba(255, 255, 255, 0.35);
-      }
-
-      /* mount bracket at very top of arm */
-      .lever-mount {
-        width: 20px;
-        height: 10px;
-        background: linear-gradient(180deg, #d4a820, #7a5a10);
-        border-radius: 4px 4px 2px 2px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-        flex-shrink: 0;
-      }
-
-      /* shaft */
-      .lever-shaft {
-        width: 9px;
-        height: 72px;
-        background: linear-gradient(90deg, #999 0%, #eee 45%, #888 100%);
-        border-radius: 4px;
-        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.4);
-        flex-shrink: 0;
-      }
-
-      /* knob ball */
-      .lever-ball {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: radial-gradient(
-          circle at 33% 28%,
-          #ff7777,
-          #cc0000 58%,
-          #880000
-        );
-        box-shadow:
-          0 0 14px rgba(200, 0, 0, 0.65),
-          0 0 28px rgba(255, 0, 0, 0.3),
-          inset 0 4px 7px rgba(255, 255, 255, 0.28),
-          inset 0 -3px 5px rgba(0, 0, 0, 0.45);
-        flex-shrink: 0;
-        transition: box-shadow 0.2s;
-      }
-
-      /* PULL label + hint arrow */
-      .lever-label {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 0.6rem;
-        letter-spacing: 3px;
-        color: var(--gold-dark);
-        text-align: center;
-        margin-top: 12px;
-        user-select: none;
-        opacity: 0.7;
-      }
-      .lever-arrow {
-        color: var(--gold-dark);
-        font-size: 1rem;
-        margin-top: 5px;
-        animation: bounce 1.1s ease-in-out infinite;
-        opacity: 0.6;
-        user-select: none;
-      }
-      @keyframes bounce {
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(6px);
-        }
-      }
-      .lever-arrow.hidden {
-        opacity: 0;
-        animation: none;
-      }
-    </style>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <canvas id="bg-canvas"></canvas>
+
     <div class="vignette"></div>
+
     <canvas id="confetti-canvas"></canvas>
+
     <div class="win-flash" id="winFlash"></div>
 
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-box">
+        <div class="modal-title">🏆 LEADERBOARD</div>
+        <div class="modal-list" id="modalList"></div>
+        <div class="modal-close" id="modalClose">✕ CLOSE</div>
+      </div>
+    </div>
+
     <div class="scene">
-      <!-- ── machine ── -->
+      <div class="left-panel" id="leftPanel">
+        <div class="name-box">
+          <div class="panel-label">PLAYER NAME</div>
+          <input
+            class="name-input"
+            id="nameInput"
+            type="text"
+            maxlength="12"
+            placeholder="YOUR NAME"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="name-err" id="nameErr"></div>
+        </div>
+
+        <div class="score-display">
+          <div class="score-label">YOUR SCORE</div>
+          <div class="score-value" id="scoreVal">0</div>
+          <div class="score-spins" id="scoreSpinsLeft">ENTER NAME TO START</div>
+        </div>
+
+        <div class="paytable-mini">
+          <div class="panel-label">POINTS TABLE</div>
+          <div class="pt-row">
+            <div class="pt-syms">7 7 7</div>
+            <div class="pt-pts jackpot">100 pts</div>
+          </div>
+          <div class="pt-row">
+            <div class="pt-syms">💎💎💎</div>
+            <div class="pt-pts">50 pts</div>
+          </div>
+          <div class="pt-row">
+            <div class="pt-syms">⭐⭐⭐</div>
+            <div class="pt-pts">40 pts</div>
+          </div>
+          <div class="pt-row">
+            <div class="pt-syms">🔔🔔🔔</div>
+            <div class="pt-pts">30 pts</div>
+          </div>
+          <div class="pt-row">
+            <div class="pt-syms">🍒🍒🍒</div>
+            <div class="pt-pts">20 pts</div>
+          </div>
+          <div class="pt-row" style="border: none">
+            <div class="pt-syms">🍋🍋🍋</div>
+            <div class="pt-pts">10 pts</div>
+          </div>
+        </div>
+
+        <div class="leaderboard">
+          <div class="panel-label">TOP PLAYERS</div>
+          <div class="lb-top3" id="lbTop3">
+            <div
+              style="
+                font-family: &quot;Bebas Neue&quot;, sans-serif;
+                font-size: 0.6rem;
+                letter-spacing: 2px;
+                color: #2a2848;
+                text-align: center;
+                padding: 10px 0;
+              "
+            >
+              NO SCORES YET
+            </div>
+          </div>
+          <button class="view-all-btn" id="viewAllBtn">
+            VIEW ALL PLAYERS ▸
+          </button>
+        </div>
+      </div>
+
       <div class="machine-col">
         <div class="marquee">
           <div class="marquee-lights">
@@ -806,26 +122,41 @@
           <div class="rivet bl"></div>
           <div class="rivet br"></div>
 
-          <div class="reels-container">
-            <!-- <div class="payline"></div> -->
-            <div class="reel-slot" id="reel0">
-              <div class="reel-strip" id="strip0"></div>
+          <div class="reels-wrapper">
+            <div class="reels-inner">
+              <div class="reel-slot" id="reel0">
+                <div class="reel-strip" id="strip0"></div>
+              </div>
+              <div class="reel-slot" id="reel1">
+                <div class="reel-strip" id="strip1"></div>
+              </div>
+              <div class="reel-slot" id="reel2">
+                <div class="reel-strip" id="strip2"></div>
+              </div>
             </div>
-            <div class="reel-slot" id="reel1">
-              <div class="reel-strip" id="strip1"></div>
-            </div>
-            <div class="reel-slot" id="reel2">
-              <div class="reel-strip" id="strip2"></div>
+            <div class="reel-labels">
+              <div class="reel-lbl">REEL I</div>
+              <div class="reel-lbl">REEL II</div>
+              <div class="reel-lbl">REEL III</div>
             </div>
           </div>
 
           <div class="status-area">
-            <div class="status-text idle" id="statusText">PULL THE LEVER!</div>
+            <div class="status-text idle" id="statusText">ENTER YOUR NAME!</div>
+            <div class="win-pts" id="winPts"></div>
           </div>
         </div>
 
         <div class="bottom-panel" id="bottomPanel">
-          <button class="spin-btn" id="spinBtn">SPIN</button>
+          <div class="spin-indicator">
+            <div class="spin-dot" id="dot0"></div>
+            <div class="spin-dot" id="dot1"></div>
+            <div class="spin-dot" id="dot2"></div>
+            <div class="spin-label">SPINS</div>
+          </div>
+
+          <button class="spin-btn" id="spinBtn" disabled>SPIN</button>
+
           <div class="bottom-lights">
             <div class="bottom-light"></div>
             <div class="bottom-light"></div>
@@ -838,7 +169,6 @@
         </div>
       </div>
 
-      <!-- ── lever ── -->
       <div class="lever-col" id="leverCol">
         <div class="lever-housing" id="leverHousing">
           <div class="lever-track" id="leverTrack">
@@ -854,604 +184,6 @@
       </div>
     </div>
 
-    <script>
-      // ════════════════════════════════
-      // CONFIG
-      // ════════════════════════════════
-      const SYMBOLS = ["7", "🍒", "💎", "⭐", "🍋", "🔔"];
-      const MULTIPLIERS = { 7: 5, "💎": 4, "⭐": 3, "🔔": 3, "🍒": 2, "🍋": 2 };
-      const SYM_H = 120;
-      const BASE_STRIP = 30;
-      const WIN_CHANCE = 0.15; // 15% — feels rewarding
-      const MAX_STREAK = 12; // safety net: force win after 12 losses
-
-      const REEL_EXTRA = [6, 8, 10];
-      const REEL_DELAY = [0, 700, 1400];
-      const REEL_DUR = [1800, 2300, 2800];
-
-      // ════════════════════════════════
-      // STATE
-      // ════════════════════════════════
-      let spinning = false;
-      let lossStreak = 0;
-      let finalSyms = [];
-
-      // ════════════════════════════════
-      // DOM
-      // ════════════════════════════════
-      const spinBtn = document.getElementById("spinBtn");
-      const statusEl = document.getElementById("statusText");
-      const winFlash = document.getElementById("winFlash");
-      const leverArm = document.getElementById("leverArm");
-      const leverTrack = document.getElementById("leverTrack");
-      const leverArrow = document.getElementById("leverArrow");
-      const strips = [0, 1, 2].map((i) => document.getElementById("strip" + i));
-      const reelSlots = [0, 1, 2].map((i) =>
-        document.getElementById("reel" + i),
-      );
-
-      // ════════════════════════════════
-      // SOUND ENGINE  (Web Audio API — no files needed)
-      // ════════════════════════════════
-      const SFX = (() => {
-        let ctx = null;
-
-        function getCtx() {
-          if (!ctx)
-            ctx = new (window.AudioContext || window.webkitAudioContext)();
-          if (ctx.state === "suspended") ctx.resume();
-          return ctx;
-        }
-
-        // ── helpers ──
-        function osc(type, freq, start, dur, gainStart, gainEnd, ac) {
-          const g = ac.createGain();
-          g.gain.setValueAtTime(gainStart, start);
-          g.gain.exponentialRampToValueAtTime(
-            Math.max(gainEnd, 0.0001),
-            start + dur,
-          );
-          const o = ac.createOscillator();
-          o.type = type;
-          o.frequency.setValueAtTime(freq, start);
-          o.connect(g);
-          g.connect(ac.destination);
-          o.start(start);
-          o.stop(start + dur + 0.01);
-        }
-
-        function oscSlide(
-          type,
-          freqStart,
-          freqEnd,
-          start,
-          dur,
-          gainStart,
-          gainEnd,
-          ac,
-        ) {
-          const g = ac.createGain();
-          g.gain.setValueAtTime(gainStart, start);
-          g.gain.exponentialRampToValueAtTime(
-            Math.max(gainEnd, 0.0001),
-            start + dur,
-          );
-          const o = ac.createOscillator();
-          o.type = type;
-          o.frequency.setValueAtTime(freqStart, start);
-          o.frequency.linearRampToValueAtTime(freqEnd, start + dur);
-          o.connect(g);
-          g.connect(ac.destination);
-          o.start(start);
-          o.stop(start + dur + 0.01);
-        }
-
-        function noise(start, dur, gainVal, ac) {
-          const buf = ac.createBuffer(1, ac.sampleRate * dur, ac.sampleRate);
-          const d = buf.getChannelData(0);
-          for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-          const src = ac.createBufferSource();
-          src.buffer = buf;
-          const g = ac.createGain();
-          g.gain.setValueAtTime(gainVal, start);
-          g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
-          // band-pass so it sounds like a clunk, not just hiss
-          const bp = ac.createBiquadFilter();
-          bp.type = "bandpass";
-          bp.frequency.value = 800;
-          bp.Q.value = 0.8;
-          src.connect(bp);
-          bp.connect(g);
-          g.connect(ac.destination);
-          src.start(start);
-          src.stop(start + dur + 0.01);
-        }
-
-        return {
-          // ── Lever pull: mechanical clunk downward ──
-          leverPull() {
-            const ac = getCtx(),
-              t = ac.currentTime;
-            noise(t, 0.06, 0.35, ac); // initial thud
-            oscSlide("sine", 180, 60, t, 0.12, 0.4, 0.01, ac);
-          },
-
-          // ── Lever snap back: spring twang ──
-          leverSnap() {
-            const ac = getCtx(),
-              t = ac.currentTime;
-            oscSlide("sine", 400, 220, t, 0.18, 0.3, 0.01, ac);
-            noise(t, 0.05, 0.15, ac);
-          },
-
-          // ── Reel spinning: continuous whirring tick ──
-          // returns a stop function
-          reelSpin() {
-            const ac = getCtx();
-            let running = true;
-            let tick = 0;
-
-            function scheduleTick() {
-              if (!running) return;
-              const t = ac.currentTime;
-              const gap = 0.055 - tick * 0.001; // speeds up slightly
-              tick = Math.min(tick + 1, 40);
-
-              // each tick: short noise burst + pitched click
-              noise(t, 0.025, 0.12, ac);
-              osc(
-                "square",
-                1200 + Math.random() * 400,
-                t,
-                0.02,
-                0.08,
-                0.001,
-                ac,
-              );
-
-              setTimeout(scheduleTick, Math.max(gap * 1000, 30));
-            }
-            scheduleTick();
-            return () => {
-              running = false;
-            };
-          },
-
-          // ── Individual reel stop: satisfying thud ──
-          reelStop(idx) {
-            const ac = getCtx(),
-              t = ac.currentTime;
-            const pitches = [140, 110, 90]; // lower pitch per reel
-            oscSlide(
-              "sine",
-              pitches[idx] * 1.4,
-              pitches[idx],
-              t,
-              0.14,
-              0.55,
-              0.01,
-              ac,
-            );
-            noise(t, 0.09, 0.4, ac);
-          },
-
-          // ── WIN: ascending fanfare ──
-          win() {
-            const ac = getCtx(),
-              t = ac.currentTime;
-            // triumphant chord arpeggio
-            const notes = [523, 659, 784, 1047, 1319]; // C5 E5 G5 C6 E6
-            notes.forEach((f, i) => {
-              const st = t + i * 0.11;
-              osc("sine", f, st, 0.6, 0.5, 0.001, ac);
-              osc("triangle", f * 2, st, 0.3, 0.15, 0.001, ac);
-            });
-            // shimmer on top
-            setTimeout(() => {
-              const ac2 = getCtx(),
-                t2 = ac2.currentTime;
-              [1047, 1319, 1568].forEach((f, i) => {
-                osc("sine", f, t2 + i * 0.07, 0.5, 0.3, 0.001, ac2);
-              });
-            }, 620);
-          },
-
-          // ── LOSE: short descending wah-wah ──
-          lose() {
-            const ac = getCtx(),
-              t = ac.currentTime;
-            oscSlide("sawtooth", 320, 180, t, 0.22, 0.25, 0.001, ac);
-            oscSlide("sawtooth", 240, 140, t + 0.24, 0.22, 0.2, 0.001, ac);
-            // muffled low thud
-            oscSlide("sine", 80, 40, t + 0.05, 0.15, 0.3, 0.001, ac);
-          },
-        };
-      })();
-
-      // ════════════════════════════════
-      // LEVER GEOMETRY
-      // ════════════════════════════════
-      let leverMax = 0;
-
-      function measureLever() {
-        const trackH = leverTrack.clientHeight;
-        const armH = leverArm.offsetHeight;
-        leverMax = Math.max(0, trackH - armH - 4);
-      }
-
-      function setLeverPos(px) {
-        leverArm.style.top = px + "px";
-      }
-
-      // ════════════════════════════════
-      // LEVER ANIMATION (Promise-based)
-      // ════════════════════════════════
-      function animateLever() {
-        return new Promise((resolve) => {
-          measureLever();
-          leverArrow.classList.add("hidden");
-
-          const PULL_MS = 260;
-          const RETURN_MS = 420;
-
-          // ── Phase 1: pull DOWN (ease-in quad) ──
-          SFX.leverPull();
-          const t0 = performance.now();
-          (function pullDown(now) {
-            const p = Math.min((now - t0) / PULL_MS, 1);
-            setLeverPos(leverMax * p * p); // quad ease-in
-            if (p < 1) requestAnimationFrame(pullDown);
-            else setTimeout(returnUp, 70); // brief pause at bottom
-          })(t0);
-
-          // ── Phase 2: spring back UP (elastic-out) ──
-          function returnUp() {
-            SFX.leverSnap();
-            const t1 = performance.now();
-            (function springBack(now) {
-              const p = Math.min((now - t1) / RETURN_MS, 1);
-              // elastic overshoot: bounces slightly past top
-              const e = 1 - Math.pow(1 - p, 3) * Math.cos(p * Math.PI * 2.8);
-              setLeverPos(leverMax * (1 - e));
-              if (p < 1) requestAnimationFrame(springBack);
-              else {
-                setLeverPos(0);
-                leverArrow.classList.remove("hidden");
-                resolve();
-              }
-            })(t1);
-          }
-        });
-      }
-
-      // ════════════════════════════════
-      // GAME LOGIC
-      // ════════════════════════════════
-      function determineResult() {
-        const forceWin = lossStreak >= MAX_STREAK;
-        const isWin = forceWin || Math.random() < WIN_CHANCE;
-        if (isWin) {
-          lossStreak = 0;
-          const s = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-          return [s, s, s];
-        } else {
-          lossStreak++;
-          let r;
-          do {
-            r = SYMBOLS.map(
-              () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
-            );
-          } while (r[0] === r[1] && r[1] === r[2]);
-          return r;
-        }
-      }
-
-      // ════════════════════════════════
-      // REEL HELPERS
-      // ════════════════════════════════
-      const rnd = () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-
-      function buildStrip(el) {
-        el.innerHTML = "";
-        for (let i = 0; i < BASE_STRIP; i++) addSym(el, rnd());
-      }
-
-      function addSym(el, txt) {
-        const d = document.createElement("div");
-        d.className = "reel-symbol" + (txt === "7" ? " is-seven" : "");
-        d.textContent = txt;
-        el.appendChild(d);
-        return d;
-      }
-
-      // Update both text and class on an existing node
-      function setSym(node, txt) {
-        node.textContent = txt;
-        node.className = "reel-symbol" + (txt === "7" ? " is-seven" : "");
-      }
-
-      // ════════════════════════════════
-      // REEL SPIN ANIMATION
-      // ════════════════════════════════
-      function spinReel(idx, target, onDone) {
-        const strip = strips[idx];
-        buildStrip(strip);
-
-        const needed = REEL_EXTRA[idx] * BASE_STRIP + BASE_STRIP + 5;
-        while (strip.children.length < needed) addSym(strip, rnd());
-
-        // Update BOTH textContent and className so '7' gets its gold style
-        const ti = strip.children.length - 3;
-        setSym(strip.children[ti], target);
-
-        strip.style.transition = "none";
-        strip.style.transform = "translateY(0px)";
-        strip.getBoundingClientRect(); // force reflow
-
-        strip.style.transition = `transform ${REEL_DUR[idx]}ms cubic-bezier(0.15,0.65,0.10,1.0)`;
-        strip.style.transform = `translateY(${-(ti * SYM_H)}px)`;
-
-        setTimeout(onDone, REEL_DUR[idx]);
-      }
-
-      // ════════════════════════════════
-      // MAIN SPIN FLOW
-      // ════════════════════════════════
-      async function doSpin() {
-        if (spinning) return;
-        spinning = true;
-        spinBtn.disabled = true;
-        reelSlots.forEach((r) => r.classList.remove("win-glow"));
-        setStatus("SPINNING...", "spinning");
-
-        // 1️⃣  Lever pull
-        await animateLever();
-
-        // 2️⃣  Pre-determine outcome
-        finalSyms = determineResult();
-
-        // 3️⃣  Spin reels left → right with stagger
-        const stopSpinSound = SFX.reelSpin(); // start continuous whirring
-        let stopped = 0;
-        for (let i = 0; i < 3; i++) {
-          const idx = i;
-          setTimeout(() => {
-            spinReel(idx, finalSyms[idx], () => {
-              SFX.reelStop(idx); // thud as each reel locks
-              if (++stopped === 3) {
-                stopSpinSound(); // kill whirring after last reel
-                onAllStopped();
-              }
-            });
-          }, REEL_DELAY[i]);
-        }
-      }
-
-      function onAllStopped() {
-        const isWin =
-          finalSyms[0] === finalSyms[1] && finalSyms[1] === finalSyms[2];
-        if (isWin) {
-          reelSlots.forEach((r) => r.classList.add("win-glow"));
-          setStatus("JACKPOT WIN!", "win");
-          setTimeout(() => SFX.win(), 80); // slight delay so last reelStop clears
-          triggerWinFX();
-        } else {
-          setStatus("TRY AGAIN", "lose");
-          setTimeout(() => SFX.lose(), 120);
-          setTimeout(() => setStatus("PULL THE LEVER!", "idle"), 1600);
-        }
-        spinning = false;
-        spinBtn.disabled = false;
-      }
-
-      // ════════════════════════════════
-      // UI HELPERS
-      // ════════════════════════════════
-      function setStatus(txt, cls) {
-        statusEl.textContent = txt;
-        statusEl.className = "status-text " + cls;
-      }
-
-      // ════════════════════════════════
-      // WIN EFFECTS
-      // ════════════════════════════════
-      function triggerWinFX() {
-        winFlash.classList.add("active");
-        setTimeout(() => winFlash.classList.remove("active"), 2400);
-        startConfetti();
-        setTimeout(stopConfetti, 3200);
-      }
-
-      // ════════════════════════════════
-      // BACKGROUND ATMOSPHERE PARTICLES
-      // ════════════════════════════════
-      (function bgAtmosphere() {
-        const bgCvs = document.getElementById("bg-canvas");
-        const bgCtx = bgCvs.getContext("2d");
-
-        function resizeBg() {
-          bgCvs.width = innerWidth;
-          bgCvs.height = innerHeight;
-        }
-        window.addEventListener("resize", resizeBg);
-        resizeBg();
-
-        // Two types: slow drifting embers + tiny sparkling dust motes
-        const particles = [];
-        const COUNT = 55;
-
-        function mkBgParticle() {
-          const isEmber = Math.random() > 0.45;
-          return {
-            x: Math.random() * innerWidth,
-            y: Math.random() * innerHeight,
-            r: isEmber ? Math.random() * 2.2 + 0.8 : Math.random() * 1.2 + 0.3,
-            vx: (Math.random() - 0.5) * 0.18,
-            vy: -(Math.random() * 0.35 + 0.08), // drift upward slowly
-            alpha: Math.random() * 0.5 + 0.1,
-            flicker: Math.random() * Math.PI * 2, // phase offset for pulse
-            flickerSpeed: Math.random() * 0.04 + 0.01,
-            // ember = warm orange/gold, dust = cool white/lavender
-            h: isEmber
-              ? Math.floor(Math.random() * 30 + 20)
-              : Math.floor(Math.random() * 60 + 200),
-            s: isEmber ? 90 : 30,
-            isEmber,
-          };
-        }
-
-        for (let i = 0; i < COUNT; i++) particles.push(mkBgParticle());
-
-        function drawBg() {
-          bgCtx.clearRect(0, 0, bgCvs.width, bgCvs.height);
-
-          particles.forEach((p) => {
-            p.flicker += p.flickerSpeed;
-            p.x += p.vx;
-            p.y += p.vy;
-
-            // Wrap around edges
-            if (p.y < -5) p.y = bgCvs.height + 5;
-            if (p.x < -5) p.x = bgCvs.width + 5;
-            if (p.x > bgCvs.width + 5) p.x = -5;
-
-            const pulse = 0.5 + 0.5 * Math.sin(p.flicker);
-            const a = p.alpha * (0.6 + 0.4 * pulse);
-
-            // Glow halo
-            const grd = bgCtx.createRadialGradient(
-              p.x,
-              p.y,
-              0,
-              p.x,
-              p.y,
-              p.r * (p.isEmber ? 4 : 3),
-            );
-            grd.addColorStop(0, `hsla(${p.h},${p.s}%,70%,${a})`);
-            grd.addColorStop(0.4, `hsla(${p.h},${p.s}%,55%,${a * 0.4})`);
-            grd.addColorStop(1, `hsla(${p.h},${p.s}%,40%,0)`);
-            bgCtx.beginPath();
-            bgCtx.arc(p.x, p.y, p.r * (p.isEmber ? 4 : 3), 0, Math.PI * 2);
-            bgCtx.fillStyle = grd;
-            bgCtx.fill();
-
-            // Core dot
-            bgCtx.beginPath();
-            bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            bgCtx.fillStyle = `hsla(${p.h},${p.s}%,90%,${a * 1.2})`;
-            bgCtx.fill();
-          });
-
-          requestAnimationFrame(drawBg);
-        }
-        drawBg();
-      })();
-
-      // ════════════════════════════════
-      // CONFETTI
-      // ════════════════════════════════
-      const cvs = document.getElementById("confetti-canvas");
-      const cctx = cvs.getContext("2d");
-      let cparts = [],
-        crun = false;
-      const CCOLS = [
-        "#FFD700",
-        "#FF4500",
-        "#00FF88",
-        "#FF69B4",
-        "#00BFFF",
-        "#FF6347",
-        "#ADFF2F",
-        "#FF1493",
-      ];
-
-      function resizeCvs() {
-        cvs.width = innerWidth;
-        cvs.height = innerHeight;
-      }
-      addEventListener("resize", resizeCvs);
-      resizeCvs();
-
-      function mkPart() {
-        return {
-          x: cvs.width * Math.random(),
-          y: Math.random() * -cvs.height * 0.6,
-          w: Math.random() * 10 + 5,
-          h: Math.random() * 5 + 4,
-          col: CCOLS[Math.floor(Math.random() * CCOLS.length)],
-          vy: Math.random() * 3.5 + 2,
-          vx: (Math.random() - 0.5) * 1.2,
-          ang: Math.random() * Math.PI * 2,
-          spin: (Math.random() - 0.5) * 0.25,
-          op: 1,
-        };
-      }
-      function startConfetti() {
-        crun = true;
-        cparts = Array.from({ length: 130 }, mkPart);
-        requestAnimationFrame(drawConfetti);
-      }
-      function stopConfetti() {
-        crun = false;
-      }
-      function drawConfetti() {
-        cctx.clearRect(0, 0, cvs.width, cvs.height);
-        cparts.forEach((p) => {
-          p.y += p.vy;
-          p.x += p.vx;
-          p.ang += p.spin;
-          if (p.y > cvs.height * 0.75)
-            p.op = Math.max(
-              0,
-              1 - (p.y - cvs.height * 0.75) / (cvs.height * 0.25),
-            );
-          cctx.save();
-          cctx.globalAlpha = p.op;
-          cctx.translate(p.x, p.y);
-          cctx.rotate(p.ang);
-          cctx.fillStyle = p.col;
-          cctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-          cctx.restore();
-        });
-        cparts = cparts.filter((p) => p.op > 0 && p.y < cvs.height + 20);
-        if (cparts.length || crun) requestAnimationFrame(drawConfetti);
-        else cctx.clearRect(0, 0, cvs.width, cvs.height);
-      }
-
-      // ════════════════════════════════
-      // EVENTS — button OR lever ball
-      // ════════════════════════════════
-      spinBtn.addEventListener("click", doSpin);
-      leverArm.addEventListener("click", doSpin);
-
-      // ════════════════════════════════
-      // INIT
-      // ════════════════════════════════
-      (function init() {
-        // Build initial reel strips and show a guaranteed visible symbol (index 0)
-        const INIT_SYMS = ["7", "🍒", "💎"]; // one nice symbol per reel
-        strips.forEach((s, i) => {
-          buildStrip(s);
-          // Overwrite index 0 with a known visible symbol
-          setSym(s.children[0], INIT_SYMS[i]);
-          s.style.transition = "none";
-          s.style.transform = "translateY(0px)"; // index 0 is perfectly centred
-        });
-
-        // size lever housing to match machine body + bottom panel combined
-        requestAnimationFrame(() => {
-          const body = document.getElementById("machineBody");
-          const bottom = document.getElementById("bottomPanel");
-          const totalH = body.offsetHeight + bottom.offsetHeight;
-          document.getElementById("leverHousing").style.minHeight =
-            totalH + "px";
-          // add marquee offset so lever-col aligns with body start
-          document.getElementById("leverCol").style.paddingTop =
-            document.querySelector(".marquee").offsetHeight + "px";
-          measureLever();
-          setLeverPos(0);
-        });
-      })();
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>

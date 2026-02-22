@@ -8,664 +8,16 @@
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <style>
-      :root {
-        --gold: #c9a84c;
-        --gold-light: #f0d070;
-        --gold-dim: #8a6a20;
-        --bg: #0d0a05;
-        --bg2: #16110a;
-        --bg3: #1e1710;
-        --text: #f0e8d0;
-        --text-dim: #8a7a5a;
-        --red: #c94040;
-        --green: #4ca870;
-        --door-bg: #2a1f0f;
-        --door-border: #5a4020;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: "DM Mono", monospace;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow-x: hidden;
-      }
-
-      /* Atmospheric background */
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background:
-          radial-gradient(
-            ellipse 80% 40% at 50% 0%,
-            rgba(201, 168, 76, 0.08) 0%,
-            transparent 70%
-          ),
-          radial-gradient(
-            ellipse 60% 60% at 20% 80%,
-            rgba(201, 168, 76, 0.04) 0%,
-            transparent 60%
-          ),
-          radial-gradient(
-            ellipse 40% 40% at 80% 20%,
-            rgba(201, 168, 76, 0.03) 0%,
-            transparent 50%
-          );
-        pointer-events: none;
-        z-index: 0;
-      }
-
-      .container {
-        width: 100%;
-        max-width: 900px;
-        padding: 40px 20px 60px;
-        position: relative;
-        z-index: 1;
-      }
-
-      /* Header */
-      header {
-        text-align: center;
-        margin-bottom: 48px;
-      }
-
-      .overline {
-        font-size: 11px;
-        letter-spacing: 0.35em;
-        color: var(--gold);
-        text-transform: uppercase;
-        margin-bottom: 12px;
-      }
-
-      h1 {
-        font-family: "Playfair Display", serif;
-        font-size: clamp(2.2rem, 5vw, 3.8rem);
-        font-weight: 900;
-        line-height: 1.05;
-        color: var(--text);
-        letter-spacing: -0.02em;
-      }
-
-      h1 span {
-        color: var(--gold);
-      }
-
-      .subtitle {
-        margin-top: 14px;
-        font-size: 13px;
-        color: var(--text-dim);
-        line-height: 1.6;
-        max-width: 520px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      /* Stats bar */
-      .stats-bar {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1px;
-        background: var(--door-border);
-        border: 1px solid var(--door-border);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-bottom: 40px;
-      }
-
-      .stat {
-        background: var(--bg2);
-        padding: 16px 12px;
-        text-align: center;
-      }
-
-      .stat-value {
-        font-family: "Playfair Display", serif;
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--gold);
-        line-height: 1;
-      }
-
-      .stat-label {
-        font-size: 10px;
-        letter-spacing: 0.2em;
-        color: var(--text-dim);
-        text-transform: uppercase;
-        margin-top: 4px;
-      }
-
-      .stat.highlight .stat-value {
-        color: var(--green);
-      }
-
-      /* Phase indicator */
-      .phase-track {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        margin-bottom: 32px;
-        font-size: 11px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--text-dim);
-      }
-
-      .phase-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--door-border);
-        transition: all 0.4s ease;
-      }
-
-      .phase-dot.active {
-        background: var(--gold);
-        box-shadow: 0 0 10px var(--gold);
-      }
-      .phase-dot.done {
-        background: var(--gold-dim);
-      }
-
-      /* Message */
-      .message-box {
-        background: var(--bg2);
-        border: 1px solid var(--door-border);
-        border-left: 3px solid var(--gold);
-        border-radius: 6px;
-        padding: 16px 20px;
-        margin-bottom: 36px;
-        font-size: 14px;
-        line-height: 1.6;
-        color: var(--text);
-        min-height: 54px;
-        transition: all 0.3s ease;
-      }
-
-      .message-box.success {
-        border-left-color: var(--green);
-      }
-      .message-box.danger {
-        border-left-color: var(--red);
-      }
-      .message-box.info {
-        border-left-color: var(--gold);
-      }
-
-      /* Doors */
-      .doors-stage {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 36px;
-        perspective: 1200px;
-      }
-
-      .door-wrap {
-        flex: 1;
-        max-width: 240px;
-      }
-
-      .door {
-        position: relative;
-        width: 100%;
-        padding-bottom: 155%;
-        cursor: pointer;
-        transform-style: preserve-3d;
-        transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .door.open {
-        transform: perspective(800px) rotateY(-25deg);
-      }
-
-      .door-front,
-      .door-back {
-        position: absolute;
-        inset: 0;
-        border-radius: 10px 10px 4px 4px;
-        backface-visibility: hidden;
-      }
-
-      .door-front {
-        background: linear-gradient(160deg, #2e2010 0%, #1a1208 100%);
-        border: 2px solid var(--door-border);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        transition:
-          border-color 0.3s,
-          box-shadow 0.3s,
-          transform 0.3s;
-        overflow: hidden;
-      }
-
-      .door-front::before {
-        content: "";
-        position: absolute;
-        inset: 8px;
-        border: 1px solid rgba(201, 168, 76, 0.15);
-        border-radius: 6px;
-        pointer-events: none;
-      }
-
-      .door-front::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 40%;
-        background: linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.04) 0%,
-          transparent 100%
-        );
-        border-radius: 10px 10px 0 0;
-        pointer-events: none;
-      }
-
-      .door-number {
-        font-family: "Playfair Display", serif;
-        font-size: 3rem;
-        font-weight: 900;
-        color: var(--gold-dim);
-        transition: color 0.3s;
-        line-height: 1;
-        margin-bottom: 8px;
-      }
-
-      .door-label {
-        font-size: 10px;
-        letter-spacing: 0.25em;
-        color: var(--text-dim);
-        text-transform: uppercase;
-      }
-
-      .door-knob {
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: radial-gradient(
-          circle at 35% 35%,
-          var(--gold-light),
-          var(--gold-dim)
-        );
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-      }
-
-      /* States */
-      .door-wrap.selectable .door-front {
-        cursor: pointer;
-      }
-
-      .door-wrap.selectable .door-front:hover {
-        border-color: var(--gold);
-        box-shadow:
-          0 0 30px rgba(201, 168, 76, 0.2),
-          inset 0 0 20px rgba(201, 168, 76, 0.05);
-        transform: translateY(-4px);
-      }
-
-      .door-wrap.selectable .door-front:hover .door-number {
-        color: var(--gold);
-      }
-
-      .door-wrap.selected .door-front {
-        border-color: var(--gold);
-        box-shadow:
-          0 0 40px rgba(201, 168, 76, 0.3),
-          0 8px 32px rgba(0, 0, 0, 0.5);
-        transform: translateY(-6px);
-      }
-
-      .door-wrap.selected .door-number {
-        color: var(--gold);
-      }
-
-      .door-wrap.goat .door-front {
-        border-color: var(--red);
-        opacity: 0.7;
-        cursor: default;
-        transform: none !important;
-      }
-
-      .door-wrap.disabled .door-front {
-        cursor: default;
-      }
-
-      /* Door content revealed */
-      .door-content {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(160deg, #0a0a0f 0%, #060608 100%);
-        border-radius: 10px 10px 4px 4px;
-        border: 2px solid var(--door-border);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-
-      .door.open .door-content {
-        opacity: 1;
-      }
-
-      .door.open .door-front {
-        opacity: 0;
-      }
-
-      .door-emoji {
-        font-size: 3rem;
-        margin-bottom: 8px;
-        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
-      }
-
-      .door-result-label {
-        font-size: 10px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-      }
-
-      .door-result-label.car {
-        color: var(--green);
-      }
-      .door-result-label.goat {
-        color: var(--red);
-      }
-
-      /* Winner glow */
-      .door-wrap.winner .door-content {
-        background: linear-gradient(160deg, #0a1a0a 0%, #050d05 100%);
-        border-color: var(--green);
-        box-shadow: 0 0 50px rgba(76, 168, 112, 0.3);
-      }
-
-      .door-wrap.loser .door-content {
-        border-color: var(--red);
-      }
-
-      /* Action area */
-      .action-area {
-        text-align: center;
-        margin-bottom: 36px;
-        min-height: 56px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .choice-buttons {
-        display: flex;
-        gap: 12px;
-      }
-
-      .btn {
-        font-family: "DM Mono", monospace;
-        font-size: 12px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        padding: 14px 28px;
-        border: 1px solid;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        background: transparent;
-      }
-
-      .btn-stay {
-        border-color: var(--text-dim);
-        color: var(--text-dim);
-      }
-
-      .btn-stay:hover {
-        border-color: var(--text);
-        color: var(--text);
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      .btn-switch {
-        border-color: var(--gold);
-        color: var(--gold);
-        background: rgba(201, 168, 76, 0.08);
-      }
-
-      .btn-switch:hover {
-        background: rgba(201, 168, 76, 0.18);
-        box-shadow: 0 0 20px rgba(201, 168, 76, 0.15);
-      }
-
-      .btn-play {
-        border-color: var(--gold);
-        color: var(--gold);
-        background: rgba(201, 168, 76, 0.1);
-        font-size: 13px;
-        padding: 15px 40px;
-      }
-
-      .btn-play:hover {
-        background: rgba(201, 168, 76, 0.2);
-        box-shadow: 0 0 30px rgba(201, 168, 76, 0.2);
-        transform: translateY(-2px);
-      }
-
-      /* Probability bars */
-      .probability-section {
-        background: var(--bg2);
-        border: 1px solid var(--door-border);
-        border-radius: 10px;
-        padding: 24px;
-        margin-bottom: 32px;
-      }
-
-      .prob-header {
-        font-size: 11px;
-        letter-spacing: 0.3em;
-        text-transform: uppercase;
-        color: var(--text-dim);
-        margin-bottom: 20px;
-        text-align: center;
-      }
-
-      .prob-row {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 12px;
-      }
-
-      .prob-row:last-child {
-        margin-bottom: 0;
-      }
-
-      .prob-name {
-        width: 80px;
-        font-size: 12px;
-        color: var(--text-dim);
-        flex-shrink: 0;
-      }
-
-      .prob-bar-track {
-        flex: 1;
-        height: 8px;
-        background: var(--bg3);
-        border-radius: 4px;
-        overflow: hidden;
-      }
-
-      .prob-bar-fill {
-        height: 100%;
-        border-radius: 4px;
-        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .prob-bar-fill.stay {
-        background: linear-gradient(90deg, var(--gold-dim), var(--gold));
-      }
-      .prob-bar-fill.switch {
-        background: linear-gradient(90deg, #2a7a50, var(--green));
-      }
-
-      .prob-pct {
-        width: 48px;
-        text-align: right;
-        font-size: 13px;
-        color: var(--text);
-        font-weight: 500;
-      }
-
-      .prob-count {
-        width: 60px;
-        text-align: right;
-        font-size: 11px;
-        color: var(--text-dim);
-      }
-
-      /* Explanation */
-      .explanation {
-        background: var(--bg2);
-        border: 1px solid var(--door-border);
-        border-radius: 10px;
-        padding: 24px;
-        font-size: 13px;
-        line-height: 1.8;
-        color: var(--text-dim);
-      }
-
-      .explanation h3 {
-        font-family: "Playfair Display", serif;
-        font-size: 1.1rem;
-        color: var(--text);
-        margin-bottom: 12px;
-        font-weight: 700;
-      }
-
-      .explanation strong {
-        color: var(--gold);
-        font-weight: 500;
-      }
-
-      /* Divider */
-      .divider {
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--door-border),
-          transparent
-        );
-        margin: 32px 0;
-      }
-
-      /* Animations */
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
-      }
-
-      @keyframes reveal-slide {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .animate-in {
-        animation: reveal-slide 0.4s ease forwards;
-      }
-
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-6px);
-        }
-        75% {
-          transform: translateX(6px);
-        }
-      }
-
-      .shake {
-        animation: shake 0.3s ease;
-      }
-
-      @keyframes winner-pulse {
-        0%,
-        100% {
-          box-shadow: 0 0 50px rgba(76, 168, 112, 0.3);
-        }
-        50% {
-          box-shadow:
-            0 0 80px rgba(76, 168, 112, 0.6),
-            0 0 120px rgba(76, 168, 112, 0.2);
-        }
-      }
-
-      .door-wrap.winner .door-content {
-        animation: winner-pulse 1.5s ease infinite;
-      }
-
-      /* Confetti particle */
-      .confetti {
-        position: fixed;
-        width: 8px;
-        height: 8px;
-        pointer-events: none;
-        animation: confetti-fall linear forwards;
-        border-radius: 2px;
-        z-index: 1000;
-      }
-
-      @keyframes confetti-fall {
-        to {
-          transform: translateY(100vh) rotate(720deg);
-          opacity: 0;
-        }
-      }
-    </style>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
       <header>
         <div class="overline">A probability paradox</div>
         <h1>The <span>Monty Hall</span><br />Problem</h1>
-        <p class="subtitle">
-          Behind one door hides a car. Behind the others — goats. You pick a
-          door. The host reveals a goat. Do you stay or switch?
-        </p>
       </header>
 
-      <!-- Stats -->
       <div class="stats-bar">
         <div class="stat">
           <div class="stat-value" id="stat-total">0</div>
@@ -685,7 +37,6 @@
         </div>
       </div>
 
-      <!-- Phase track -->
       <div class="phase-track">
         <div class="phase-dot active" id="phase-1"></div>
         <span id="phase-label">Pick a door</span>
@@ -693,13 +44,11 @@
         <div class="phase-dot" id="phase-3"></div>
       </div>
 
-      <!-- Message -->
       <div class="message-box info" id="message-box">
         🎭 Three doors stand before you. Behind one: a brand new car. Behind the
         others: goats. Choose your door to begin.
       </div>
 
-      <!-- Doors -->
       <div class="doors-stage" id="doors-stage">
         <div class="door-wrap selectable" id="door-0" onclick="selectDoor(0)">
           <div class="door" id="door-anim-0">
@@ -742,306 +91,67 @@
         </div>
       </div>
 
-      <!-- Action area -->
-      <div class="action-area" id="action-area">
-        <!-- populated dynamically -->
-      </div>
+      <div class="action-area" id="action-area"></div>
 
-      <!-- Probability bars -->
-      <div class="probability-section">
-        <div class="prob-header">Running Statistics</div>
-        <div class="prob-row">
-          <div class="prob-name">Stay</div>
-          <div class="prob-bar-track">
-            <div
-              class="prob-bar-fill stay"
-              id="bar-stay"
-              style="width: 33%"
-            ></div>
-          </div>
-          <div class="prob-pct" id="pct-stay">—</div>
-          <div class="prob-count" id="cnt-stay">0 wins</div>
+      <div class="sim-section">
+        <div class="sim-header">Auto-simulate — always switching</div>
+        <div class="sim-buttons">
+          <button class="btn-sim" onclick="runSimulation(10)">× 10</button>
+          <button class="btn-sim" onclick="runSimulation(100)">× 100</button>
+          <button class="btn-sim" onclick="runSimulation(1000)">× 1,000</button>
         </div>
-        <div class="prob-row">
-          <div class="prob-name">Switch</div>
-          <div class="prob-bar-track">
-            <div
-              class="prob-bar-fill switch"
-              id="bar-switch"
-              style="width: 67%"
-            ></div>
+
+        <div class="sim-results" id="sim-results">
+          <div class="sim-result-cell switch-cell">
+            <div class="label">Switch wins</div>
+            <div class="value" id="sim-switch-pct">—</div>
+            <div class="sub" id="sim-switch-count">0 / 0</div>
           </div>
-          <div class="prob-pct" id="pct-switch">—</div>
-          <div class="prob-count" id="cnt-switch">0 wins</div>
+          <div class="sim-result-cell stay-cell">
+            <div class="label">Stay wins</div>
+            <div class="value" id="sim-stay-pct">—</div>
+            <div class="sub" id="sim-stay-count">0 / 0</div>
+          </div>
+        </div>
+
+        <div class="sim-prob-bars" id="sim-bars" style="display: none">
+          <div class="sim-bar-row">
+            <div class="sim-bar-name">Switch</div>
+            <div class="sim-bar-track">
+              <div class="sim-bar-fill switch" id="sim-bar-switch"></div>
+            </div>
+            <div class="sim-bar-pct" id="sim-pct-switch">—</div>
+          </div>
+          <div class="sim-bar-row">
+            <div class="sim-bar-name">Stay</div>
+            <div class="sim-bar-track">
+              <div class="sim-bar-fill stay" id="sim-bar-stay"></div>
+            </div>
+            <div class="sim-bar-pct" id="sim-pct-stay">—</div>
+          </div>
         </div>
       </div>
 
       <div class="divider"></div>
 
-      <!-- Explanation -->
       <div class="explanation">
-        <h3>Why switching wins ⅔ of the time</h3>
+        <h3>Why switching wins 2/3 of the time</h3>
         <p>
           When you first pick a door, you have a <strong>1 in 3</strong> chance
           of being right. The host — who <em>always</em> knows where the car is
           — opens a goat door. This doesn't change your original odds. Your door
-          still carries a <strong>⅓ probability</strong>.
+          still carries a <strong>1/3 probability</strong>.
         </p>
         <br />
         <p>
-          But now the <strong>remaining ⅔ probability</strong> has been
+          But now the <strong>remaining 2/3 probability</strong> has been
           consolidated onto the single other door. Switching wins twice as often
           as staying. It seems wrong — but the math is clear, and the simulation
           proves it.
         </p>
-        <br />
-        <p>
-          <em>Play enough games and watch the bars converge to 33% vs 67%.</em>
-        </p>
       </div>
     </div>
 
-    <script>
-      // Game state
-      let gameState = {
-        phase: "pick", // pick | switch | reveal
-        carDoor: -1,
-        selectedDoor: -1,
-        revealedDoor: -1,
-        stats: {
-          total: 0,
-          stayWins: 0,
-          switchWins: 0,
-          stayTotal: 0,
-          switchTotal: 0,
-        },
-      };
-
-      function initGame() {
-        gameState.phase = "pick";
-        gameState.carDoor = Math.floor(Math.random() * 3);
-        gameState.selectedDoor = -1;
-        gameState.revealedDoor = -1;
-
-        // Reset doors UI
-        for (let i = 0; i < 3; i++) {
-          const wrap = document.getElementById(`door-${i}`);
-          const anim = document.getElementById(`door-anim-${i}`);
-          wrap.className = "door-wrap selectable";
-          anim.classList.remove("open");
-        }
-
-        // Phase
-        updatePhase(1, "Pick a door");
-        setMessage(
-          "info",
-          "🎭 Three doors stand before you. Behind one: a brand new car. Behind the others: goats. Choose your door to begin.",
-        );
-        setAction("");
-      }
-
-      function selectDoor(idx) {
-        if (gameState.phase !== "pick") return;
-        gameState.selectedDoor = idx;
-        gameState.phase = "switch";
-
-        // Mark selected
-        for (let i = 0; i < 3; i++) {
-          const wrap = document.getElementById(`door-${i}`);
-          wrap.className =
-            i === idx ? "door-wrap selected" : "door-wrap disabled";
-        }
-
-        // Reveal a goat (not selected, not car)
-        let goatOptions = [0, 1, 2].filter(
-          (i) => i !== idx && i !== gameState.carDoor,
-        );
-        gameState.revealedDoor =
-          goatOptions[Math.floor(Math.random() * goatOptions.length)];
-
-        setTimeout(() => {
-          revealDoor(gameState.revealedDoor, "goat");
-          document.getElementById(`door-${gameState.revealedDoor}`).className =
-            "door-wrap goat";
-
-          updatePhase(2, "Stay or switch?");
-          setMessage(
-            "info",
-            `🐐 Monty opens Door ${["I", "II", "III"][gameState.revealedDoor]} — it's a goat! Now: do you <strong>stay</strong> with your original choice, or <strong>switch</strong> to the other door?`,
-          );
-          setAction("choice");
-        }, 400);
-      }
-
-      function makeChoice(stayOrSwitch) {
-        gameState.phase = "reveal";
-        const finalDoor =
-          stayOrSwitch === "stay"
-            ? gameState.selectedDoor
-            : [0, 1, 2].find(
-                (i) =>
-                  i !== gameState.selectedDoor && i !== gameState.revealedDoor,
-              );
-
-        // Update stats
-        const won = finalDoor === gameState.carDoor;
-        gameState.stats.total++;
-        if (stayOrSwitch === "stay") {
-          gameState.stats.stayTotal++;
-          if (won) gameState.stats.stayWins++;
-        } else {
-          gameState.stats.switchTotal++;
-          if (won) gameState.stats.switchWins++;
-        }
-
-        // Reveal all doors
-        for (let i = 0; i < 3; i++) {
-          if (i !== gameState.revealedDoor) {
-            const isCar = i === gameState.carDoor;
-            setTimeout(() => revealDoor(i, isCar ? "car" : "goat"), i * 120);
-          }
-        }
-
-        setTimeout(() => {
-          // Mark winner/loser
-          for (let i = 0; i < 3; i++) {
-            const wrap = document.getElementById(`door-${i}`);
-            if (i === finalDoor) {
-              wrap.className = won ? "door-wrap winner" : "door-wrap loser";
-            } else if (i !== gameState.revealedDoor) {
-              wrap.className = "door-wrap disabled";
-            }
-          }
-
-          if (won) {
-            setMessage(
-              "success",
-              `🏆 <strong>You won the car!</strong> You chose to ${stayOrSwitch}. Lucky${stayOrSwitch === "switch" ? " — and statistically smart!" : ", though the odds were against you!"}`,
-            );
-            spawnConfetti();
-          } else {
-            setMessage(
-              "danger",
-              `🐐 <strong>You got a goat.</strong> You chose to ${stayOrSwitch}. ${stayOrSwitch === "stay" ? "Switching would have won!" : "Tough luck — the car was behind your original door!"}`,
-            );
-          }
-
-          updateStats();
-          updatePhase(3, "Game over");
-          setAction("play-again");
-        }, 600);
-      }
-
-      function revealDoor(idx, type) {
-        const emoji = document.getElementById(`door-emoji-${idx}`);
-        const label = document.getElementById(`door-result-${idx}`);
-        const anim = document.getElementById(`door-anim-${idx}`);
-        const resultEl = document.getElementById(`door-result-${idx}`);
-
-        if (type === "car") {
-          emoji.textContent = "🚗";
-          label.textContent = "Car!";
-          resultEl.className = "door-result-label car";
-        } else {
-          emoji.textContent = "🐐";
-          label.textContent = "Goat";
-          resultEl.className = "door-result-label goat";
-        }
-
-        anim.classList.add("open");
-      }
-
-      function setMessage(type, html) {
-        const box = document.getElementById("message-box");
-        box.className = `message-box ${type} animate-in`;
-        box.innerHTML = html;
-        void box.offsetWidth;
-        box.classList.add("animate-in");
-      }
-
-      function setAction(type) {
-        const area = document.getElementById("action-area");
-        if (type === "choice") {
-          area.innerHTML = `
-        <div style="font-size:12px;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase">Your move:</div>
-        <div class="choice-buttons">
-          <button class="btn btn-stay" onclick="makeChoice('stay')">Stay with door ${["I", "II", "III"][gameState.selectedDoor]}</button>
-          <button class="btn btn-switch" onclick="makeChoice('switch')">Switch doors</button>
-        </div>
-      `;
-        } else if (type === "play-again") {
-          area.innerHTML = `<button class="btn btn-play" onclick="initGame()">Play Again</button>`;
-        } else {
-          area.innerHTML = "";
-        }
-      }
-
-      function updatePhase(active, label) {
-        for (let i = 1; i <= 3; i++) {
-          const dot = document.getElementById(`phase-${i}`);
-          dot.className =
-            "phase-dot" +
-            (i < active ? " done" : i === active ? " active" : "");
-        }
-        document.getElementById("phase-label").textContent = label;
-      }
-
-      function updateStats() {
-        const s = gameState.stats;
-        document.getElementById("stat-total").textContent = s.total;
-        document.getElementById("stat-switch-wins").textContent = s.switchWins;
-        document.getElementById("stat-stay-wins").textContent = s.stayWins;
-
-        const switchRate =
-          s.switchTotal > 0
-            ? Math.round((s.switchWins / s.switchTotal) * 100)
-            : null;
-        const stayRate =
-          s.stayTotal > 0 ? Math.round((s.stayWins / s.stayTotal) * 100) : null;
-
-        document.getElementById("stat-switch-rate").textContent =
-          switchRate !== null ? switchRate + "%" : "—";
-
-        // Bars
-        if (s.stayTotal > 0 || s.switchTotal > 0) {
-          const total = s.stayTotal + s.switchTotal;
-          document.getElementById("bar-stay").style.width = stayRate + "%";
-          document.getElementById("bar-switch").style.width = switchRate + "%";
-          document.getElementById("pct-stay").textContent =
-            stayRate !== null ? stayRate + "%" : "—";
-          document.getElementById("pct-switch").textContent =
-            switchRate !== null ? switchRate + "%" : "—";
-        }
-        document.getElementById("cnt-stay").textContent =
-          `${s.stayWins}/${s.stayTotal} wins`;
-        document.getElementById("cnt-switch").textContent =
-          `${s.switchWins}/${s.switchTotal} wins`;
-      }
-
-      function spawnConfetti() {
-        const colors = ["#c9a84c", "#f0d070", "#4ca870", "#ffffff", "#c94040"];
-        for (let i = 0; i < 40; i++) {
-          setTimeout(() => {
-            const el = document.createElement("div");
-            el.className = "confetti";
-            el.style.cssText = `
-          left: ${20 + Math.random() * 60}%;
-          top: -10px;
-          background: ${colors[Math.floor(Math.random() * colors.length)]};
-          transform: rotate(${Math.random() * 360}deg);
-          animation-duration: ${0.8 + Math.random() * 1.2}s;
-          animation-delay: ${Math.random() * 0.3}s;
-          width: ${4 + Math.random() * 8}px;
-          height: ${4 + Math.random() * 8}px;
-        `;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 2000);
-          }, i * 30);
-        }
-      }
-
-      // Start
-      initGame();
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>

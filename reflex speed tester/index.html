@@ -9,6 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap"
       rel="stylesheet"
     />
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -16,6 +17,33 @@
       <div>
         <div class="title">REFLEX</div>
         <div class="subtitle">// reaction speed test //</div>
+      </div>
+
+      <div class="player-row">
+        <div class="player-label">PLAYER</div>
+        <input
+          type="text"
+          id="player-name"
+          class="player-input"
+          placeholder="enter your name..."
+          maxlength="16"
+        />
+        <div class="mode-toggle">
+          <button
+            class="mode-btn active"
+            id="mode-normal"
+            onclick="setMode('normal')"
+          >
+            NORMAL
+          </button>
+          <button
+            class="mode-btn"
+            id="mode-fakeout"
+            onclick="setMode('fakeout')"
+          >
+            FAKE-OUT
+          </button>
+        </div>
       </div>
 
       <div class="stats">
@@ -57,6 +85,9 @@
             test your reaction time<br />click when it turns green
           </div>
         </div>
+        <div class="mode-badge" id="mode-badge" style="display: none">
+          ⚠ FAKE-OUT MODE
+        </div>
       </div>
 
       <div class="error-overlay" id="error-overlay"></div>
@@ -65,9 +96,65 @@
 
       <div class="btn-row">
         <button class="btn primary" onclick="startGame()">[ NEW TEST ]</button>
+        <button
+          class="btn"
+          onclick="submitScore()"
+          id="btn-submit"
+          style="display: none"
+        >
+          [ SUBMIT SCORE ]
+        </button>
         <button class="btn" onclick="resetStats()">[ RESET ]</button>
       </div>
     </div>
+
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="closeLeaderboard()"
+    ></div>
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="modal-title">LEADERBOARD</div>
+        <div class="modal-subtitle">// all-time best scores //</div>
+        <button class="modal-close" onclick="closeLeaderboard()">✕</button>
+      </div>
+      <div class="lb-tabs">
+        <button
+          class="lb-tab active"
+          id="tab-normal"
+          onclick="switchTab('normal')"
+        >
+          NORMAL
+        </button>
+        <button class="lb-tab" id="tab-fakeout" onclick="switchTab('fakeout')">
+          FAKE-OUT
+        </button>
+      </div>
+      <div class="lb-table-wrap">
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>PLAYER</th>
+              <th>BEST</th>
+              <th>AVG</th>
+              <th>RATING</th>
+            </tr>
+          </thead>
+          <tbody id="lb-body"></tbody>
+        </table>
+        <div class="lb-empty" id="lb-empty">NO SCORES YET — BE THE FIRST</div>
+      </div>
+      <button class="btn danger-btn" onclick="clearLeaderboard()">
+        [ CLEAR BOARD ]
+      </button>
+    </div>
+
+    <button class="lb-fab" onclick="openLeaderboard()" title="Leaderboard">
+      <span class="lb-fab-icon">▤</span>
+      <span class="lb-fab-label">BOARD</span>
+    </button>
 
     <script src="script.js"></script>
   </body>
