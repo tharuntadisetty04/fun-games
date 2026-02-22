@@ -10,6 +10,6 @@
 
 - https://tharuntadisetty04.github.io/fun-games/monty%20hall/
 
-- https://tharuntadisetty04.github.io/fun-games/monty%20hall%20v2/
-
 - https://tharuntadisetty04.github.io/fun-games/reflex%20speed%20tester/
+
+- https://tharuntadisetty04.github.io/fun-games/whac%20a%20mole/
