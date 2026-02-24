@@ -24,191 +24,6 @@ const modeBadge = document.getElementById("mode-badge");
 const btnSubmit = document.getElementById("btn-submit");
 const playerInput = document.getElementById("player-name");
 
-let audioCtx = null;
-
-function getAudioCtx() {
-  if (!audioCtx)
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === "suspended") audioCtx.resume();
-  return audioCtx;
-}
-
-function playTone({
-  type = "sine",
-  freq = 440,
-  endFreq,
-  gain = 0.25,
-  attack = 0.005,
-  decay = 0.15,
-  start = 0,
-}) {
-  const ctx = getAudioCtx();
-  const osc = ctx.createOscillator();
-  const g = ctx.createGain();
-  osc.connect(g);
-  g.connect(ctx.destination);
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
-  if (endFreq)
-    osc.frequency.exponentialRampToValueAtTime(
-      endFreq,
-      ctx.currentTime + start + decay,
-    );
-  g.gain.setValueAtTime(0, ctx.currentTime + start);
-  g.gain.linearRampToValueAtTime(gain, ctx.currentTime + start + attack);
-  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + decay);
-  osc.start(ctx.currentTime + start);
-  osc.stop(ctx.currentTime + start + decay + 0.05);
-}
-
-function playNoise({ gain = 0.1, decay = 0.12, start = 0, freq = 800 }) {
-  const ctx = getAudioCtx();
-  const bufSize = ctx.sampleRate * (decay + 0.05);
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
-  const src = ctx.createBufferSource();
-  src.buffer = buf;
-  const filter = ctx.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.frequency.value = freq;
-  filter.Q.value = 0.5;
-  const g = ctx.createGain();
-  src.connect(filter);
-  filter.connect(g);
-  g.connect(ctx.destination);
-  g.gain.setValueAtTime(gain, ctx.currentTime + start);
-  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + decay);
-  src.start(ctx.currentTime + start);
-  src.stop(ctx.currentTime + start + decay + 0.05);
-}
-
-function playHeartbeat(intensity = 1) {
-  const vol = Math.min(0.18 * intensity, 0.35);
-  playTone({ type: "sine", freq: 80, endFreq: 35, gain: vol, decay: 0.18 });
-  playNoise({ gain: vol * 0.3, decay: 0.08, freq: 120 });
-  setTimeout(() => {
-    playTone({
-      type: "sine",
-      freq: 70,
-      endFreq: 30,
-      gain: vol * 0.7,
-      decay: 0.14,
-    });
-    playNoise({ gain: vol * 0.2, decay: 0.06, freq: 100 });
-  }, 160);
-}
-
-function sfxStart() {
-  playTone({
-    type: "sawtooth",
-    freq: 110,
-    endFreq: 100,
-    gain: 0.06,
-    decay: 0.6,
-  });
-  playTone({ type: "square", freq: 440, gain: 0.04, decay: 0.05 });
-}
-
-function sfxGo() {
-  playTone({
-    type: "square",
-    freq: 300,
-    endFreq: 1200,
-    gain: 0.22,
-    attack: 0.001,
-    decay: 0.08,
-  });
-  playTone({
-    type: "sine",
-    freq: 800,
-    endFreq: 1600,
-    gain: 0.18,
-    attack: 0.001,
-    decay: 0.12,
-    start: 0.04,
-  });
-  playNoise({ gain: 0.1, decay: 0.06, freq: 2000 });
-}
-
-function sfxFakeout() {
-  playTone({
-    type: "sawtooth",
-    freq: 400,
-    endFreq: 200,
-    gain: 0.14,
-    attack: 0.001,
-    decay: 0.1,
-  });
-  playNoise({ gain: 0.06, decay: 0.08, freq: 600 });
-}
-
-function sfxEarly() {
-  playTone({
-    type: "sawtooth",
-    freq: 280,
-    endFreq: 60,
-    gain: 0.28,
-    decay: 0.35,
-  });
-  playNoise({ gain: 0.15, decay: 0.25, freq: 200 });
-  playTone({
-    type: "square",
-    freq: 120,
-    endFreq: 50,
-    gain: 0.12,
-    decay: 0.4,
-    start: 0.05,
-  });
-}
-
-function sfxResult(ms) {
-  const quality = Math.max(0, Math.min(1, (500 - ms) / 350));
-  const baseFreq = 400 + quality * 800;
-  playTone({
-    type: "sine",
-    freq: baseFreq,
-    endFreq: baseFreq * 1.5,
-    gain: 0.15,
-    decay: 0.25,
-  });
-  playTone({
-    type: "sine",
-    freq: baseFreq * 1.25,
-    gain: 0.1,
-    decay: 0.35,
-    start: 0.06,
-  });
-  if (ms < 250)
-    playTone({
-      type: "sine",
-      freq: baseFreq * 2,
-      gain: 0.08,
-      decay: 0.3,
-      start: 0.12,
-    });
-}
-
-function sfxNewBest() {
-  playTone({ type: "sine", freq: 600, endFreq: 900, gain: 0.18, decay: 0.2 });
-  playTone({
-    type: "sine",
-    freq: 750,
-    endFreq: 1100,
-    gain: 0.14,
-    decay: 0.25,
-    start: 0.15,
-  });
-  playTone({
-    type: "sine",
-    freq: 900,
-    endFreq: 1400,
-    gain: 0.1,
-    decay: 0.3,
-    start: 0.3,
-  });
-}
-
 function triggerPulse() {
   pulseRing.classList.remove("beat");
   void pulseRing.offsetWidth;
@@ -222,11 +37,9 @@ function startHeartbeat(totalDelay) {
     if (state !== "waiting") return;
     const progress = Math.min(elapsed / totalDelay, 0.95);
     const interval = 1100 - progress * 800;
-    const intensity = 1 + progress * 1.5;
     heartbeatInterval = setTimeout(() => {
       if (state !== "waiting") return;
       triggerPulse();
-      playHeartbeat(intensity);
       elapsed += interval;
       scheduleBeat();
     }, interval);
@@ -288,7 +101,6 @@ function triggerFakeout() {
   mainText.style.color = "#ff8800";
   mainText.textContent = "CLICK NOW!";
   mainText.classList.add("go-flash");
-  sfxFakeout();
 
   let fb = document.getElementById("fakeout-burst");
   if (!fb) {
@@ -347,7 +159,6 @@ function startGame() {
     gameMode === "fakeout"
       ? "watch out for fake flashes!"
       : "hold on... not yet!";
-  sfxStart();
 
   const delay = 1500 + Math.random() * 3000;
   startHeartbeat(delay);
@@ -378,7 +189,6 @@ function showGo() {
   void goBurst.offsetWidth;
   goBurst.classList.add("active");
 
-  sfxGo();
   startTime = performance.now();
 }
 
@@ -405,7 +215,6 @@ function handleClick() {
       errorOverlay.classList.remove("flash");
       void errorOverlay.offsetWidth;
       errorOverlay.classList.add("flash");
-      sfxEarly();
       tensionFill.style.width = "0%";
       return;
     }
@@ -424,7 +233,6 @@ function handleClick() {
     errorOverlay.classList.remove("flash");
     void errorOverlay.offsetWidth;
     errorOverlay.classList.add("flash");
-    sfxEarly();
     tensionFill.style.width = "0%";
     return;
   }
@@ -456,12 +264,7 @@ function recordResult(ms) {
   mainText.classList.remove("go-flash");
   subText.innerHTML = `<span style="color:${ratingColor};letter-spacing:3px;border:1px solid ${ratingColor};padding:2px 8px">${rating}</span><br><br>click to test again`;
 
-  if (isNewBest) {
-    sfxNewBest();
-    showNewBestBanner();
-  } else {
-    sfxResult(ms);
-  }
+  if (isNewBest) showNewBestBanner();
 
   updateHistory();
 
@@ -584,8 +387,6 @@ function submitScore() {
   setTimeout(() => {
     btnSubmit.style.display = "none";
   }, 1500);
-
-  playTone({ type: "sine", freq: 660, endFreq: 880, gain: 0.12, decay: 0.2 });
 }
 
 function openLeaderboard() {
