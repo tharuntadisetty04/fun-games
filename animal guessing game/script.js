@@ -3,9 +3,9 @@ const ANIMALS = [
     name: "Dog",
     region: "🏠 Domestic",
     hints: [
-      "I have a wet nose that can detect smells 100,000 times better than a human, and I can hear sounds from 4 times farther away.",
-      "I have four legs, I wag my tail when happy, and I bark to communicate with my owner.",
-      "I am the most popular pet in the world — people call me man's best friend!",
+      "I have a very strong sense of smell and can hear sounds that humans cannot hear from far away.",
+      "I am a loyal and friendly animal that many families keep as a pet.",
+      "I walk on four legs, wag my tail when I am happy, and bark to communicate with people.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/YellowLabradorLooking_new.jpg/500px-YellowLabradorLooking_new.jpg",
@@ -15,9 +15,9 @@ const ANIMALS = [
     name: "Cat",
     region: "🏠 Domestic",
     hints: [
-      "I sleep up to 16 hours a day, can jump 6 times my own height, and I always land on my feet.",
-      "I have whiskers, sharp claws, and I make a soft rumbling sound called purring when I am happy.",
-      "I say 'meow' and I am a very popular furry pet that people keep at home.",
+      "I sleep up to 16 hours a day and can jump much higher than my own height.",
+      "I have soft fur, long whiskers, and sharp claws that help me climb and catch things.",
+      "I make a meow sound and people often keep me as a quiet pet at home.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/500px-Cat_November_2010-1a.jpg",
@@ -28,8 +28,8 @@ const ANIMALS = [
     region: "🇮🇳 India",
     hints: [
       "I have four stomachs and I chew my food twice — once when I eat and once when I bring it back up later.",
-      "I am a large domestic animal that gives milk, and I say 'moo'.",
-      "You see me walking freely on Indian roads — I am considered sacred in India!",
+      "In India, you often see me walking freely on roads and near houses.",
+      "I am a large domestic animal that gives milk and makes a moo sound.",
     ],
     image:
       "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y293fGVufDB8fDB8fHww",
@@ -40,8 +40,8 @@ const ANIMALS = [
     region: "🇮🇳 India",
     hints: [
       "I have rectangular pupils that give me almost 360-degree vision to watch for danger on all sides.",
-      "I am a small horned animal that will eat almost anything — leaves, grass, even cardboard!",
-      "I say 'meh' or 'baa', I give milk, and I am commonly raised on farms across India.",
+      "I am a small horned animal that will eat almost anything — leaves, grass, and many kinds of plants.",
+      "I say 'meh', I give milk, and I am commonly raised on farms across India.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/b/b2/Hausziege_04.jpg",
@@ -51,21 +51,21 @@ const ANIMALS = [
     name: "Horse",
     region: "🌍 Worldwide",
     hints: [
-      "I can sleep both standing up and lying down, and I can run within just a few hours of being born.",
-      "I am a large mammal with a flowing mane and tail, and I communicate by neighing.",
-      "Humans have ridden me for thousands of years — I am used in races, polo, and farming.",
+      "I am a strong and fast animal that can travel for long distances without getting tired.",
+      "I am a large mammal with a long tail, and strong legs and I communicate by neighing.",
+      "Humans ride me and use my speed for transport, racing, and other fast sports like polo.",
     ],
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Nokota_Horses_cropped.jpg/500px-Nokota_Horses_cropped.jpg",
+      "https://media.istockphoto.com/id/521697371/photo/brown-pedigree-horse.jpg?s=612x612&w=0&k=20&c=x19W0K7iuQhQn_7l3wRqWq-zsbo0oRA33C3OF4nooL0=",
     sound: null,
   },
   {
     name: "Hen",
     region: "🏠 Domestic",
     hints: [
-      "I have no teeth — I swallow small stones to help grind up my food inside my stomach.",
-      "I am a female bird that clucks, lives on farms, and lays eggs that you eat for breakfast.",
-      "My male partner is the rooster who crows every morning. You see me on almost every Indian farm!",
+      "I am a bird that cannot fly very far and spend most of my time on the ground.",
+      "I scratch the soil with my feet to find food like insects and grains.",
+      "Farmers raise me for eggs and sometimes for meat.",
     ],
     image:
       "https://cdn.pixabay.com/photo/2018/07/13/11/24/chicken-3535547_1280.jpg",
@@ -75,21 +75,21 @@ const ANIMALS = [
     name: "Duck",
     region: "🌍 Worldwide",
     hints: [
-      "My feathers are completely waterproof — water just rolls off me — and I can see in almost every direction without turning my head.",
-      "I am a bird with a flat orange beak that can walk, fly, and swim. I say 'quack'.",
-      "You can see me floating on ponds and lakes. Kids love to feed me bread at parks!",
+      "My feathers are covered with special oil that keeps them waterproof when I swim.",
+      "I can walk on land, swim in water, and fly in the sky.",
+      "I live near ponds, lakes, and rivers. I say 'quack'.",
     ],
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Bucephala-albeola-010.jpg/500px-Bucephala-albeola-010.jpg",
+      "https://i.pinimg.com/736x/58/92/a5/5892a5ad44ab6246a6a29a23b18b4e58.jpg",
     sound: null,
   },
   {
     name: "Parrot",
     region: "🇮🇳 India",
     hints: [
-      "I am one of the very few animals that can mimic human speech, and I can live up to 80 years — longer than many humans!",
-      "I am a colourful bird with a curved beak that copies sounds and words people say to me.",
-      "I am commonly bright green with a red beak in India — people call me 'Mittu' and keep me as a pet!",
+      "I am a colorful bird that can copy human sounds and words.",
+      "I have a strong curved beak that helps me eat seeds and fruits.",
+      "I am commonly bright green with a red beak, and many people keep me as a pet.",
     ],
     image:
       "https://i.pinimg.com/474x/69/e2/e9/69e2e9cd082c665dd0dff0fd98f79503.jpg",
@@ -99,9 +99,9 @@ const ANIMALS = [
     name: "Elephant",
     region: "🇮🇳 India",
     hints: [
-      "I am the only animal that cannot jump, and I use low rumbling sounds too deep for humans to hear to talk to others far away.",
-      "I have a long trunk with over 40,000 muscles that I use to drink, pick up objects, and greet friends.",
-      "I am the largest land animal on Earth, I have big ears and tusks, and I never forget anything!",
+      "I am the biggest land animal and I have very large, floppy ears.",
+      "I use my long trunk to eat food, drink water, and pick up things.",
+      "I have two long white tusks and I make a loud trumpeting sound.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/African_Bush_Elephant.jpg/500px-African_Bush_Elephant.jpg",
@@ -111,9 +111,9 @@ const ANIMALS = [
     name: "Monkey",
     region: "🇮🇳 India",
     hints: [
-      "I have fingerprints almost identical to human fingerprints, and I use my tail like an extra hand to grip branches.",
-      "I am a primate with a long tail who lives in trees, swings through branches, and loves fruits.",
-      "You will find me stealing food near temples and markets all across India — I am very clever and mischievous!",
+      "I use my hands and tail to grab branches and move easily from one tree to another.",
+      "I belong to the primate family and look similar to humans in my actions and movements.",
+      "People often see me around villages and cities, especially near temples and markets.",
     ],
     image:
       "https://images.unsplash.com/photo-1605559911160-a3d95d213904?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bW9ua2V5fGVufDB8fDB8fHww",
@@ -123,33 +123,21 @@ const ANIMALS = [
     name: "Tiger",
     region: "🇮🇳 India",
     hints: [
-      "I am an excellent swimmer and I love water — unlike most cats. My roar can be heard from 3 kilometres away.",
-      "I have orange fur with black stripes. No two of us have the same stripe pattern — it is unique like a fingerprint.",
-      "I am India's national animal and the largest wild cat in the world. You can find me in places like Jim Corbett!",
+      "I have orange fur with black stripes all over my body.",
+      "I move silently through forests and grasslands while hunting my prey.",
+      "I am India's national animal and the largest wild cat in the world.",
     ],
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Walking_tiger_female.jpg/500px-Walking_tiger_female.jpg",
-    sound: null,
-  },
-  {
-    name: "Deer",
-    region: "🇮🇳 India",
-    hints: [
-      "I shed and regrow my antlers every single year — they are the fastest-growing bone tissue in the animal kingdom.",
-      "I am a fast, graceful animal with big brown eyes and the males of my kind grow branching horns on their heads.",
-      "I am gentle and harmless — I eat grass and leaves in forests. A tiger's favourite meal!",
-    ],
-    image:
-      "https://media.istockphoto.com/id/472096009/photo/deer-fawn.jpg?s=612x612&w=0&k=20&c=yrn9kafoYvfcutnWXn_fJCoONqyCndIb0qi_Jqte5L0=",
+      "https://img.freepik.com/free-photo/tiger-looking-with-open-mouth_1150-18083.jpg?semt=ais_hybrid&w=740&q=80",
     sound: null,
   },
   {
     name: "Bear",
     region: "🌍 Worldwide",
     hints: [
-      "I do not truly hibernate — my body temperature only drops slightly and I can wake up quickly if disturbed during my winter sleep.",
-      "I am a large furry mammal that loves honey. I sleep through most of winter in a den.",
-      "Winnie-the-Pooh and Baloo from The Jungle Book are both based on me!",
+      "I am a very large animal with thick fur, and powerful claws made for digging or climbing.",
+      "I am an omnivore, so I eat both plants and animals.",
+      "During winter, I hibernate by sleeping in a den for a long time.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/2010-kodiak-bear-1.jpg/1280px-2010-kodiak-bear-1.jpg",
@@ -159,9 +147,9 @@ const ANIMALS = [
     name: "Camel",
     region: "🇮🇳 Rajasthan",
     hints: [
-      "My hump stores fat — not water — and I can drink up to 200 litres of water in one go to prepare for the desert.",
-      "I can survive many days without water and I am built for hot sandy deserts with tough feet and long eyelashes.",
-      "I am called the 'Ship of the Desert'. You can ride me at the Pushkar fair in Rajasthan!",
+      "I can walk on hot deserts for a long time without needing to drink water.",
+      "I have a big hump on my back where I store fat for energy.",
+      "I am called the 'Ship of the Desert'.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/4/43/07._Camel_Profile%2C_near_Silverton%2C_NSW%2C_07.07.2007.jpg",
@@ -171,57 +159,93 @@ const ANIMALS = [
     name: "Lion",
     region: "🌍 Africa / India",
     hints: [
-      "I am the only cat that lives in social groups called prides. The females do most of the hunting while the males guard the territory.",
-      "The male of my species has a big fluffy mane around his face. I have a very powerful roar.",
-      "I am called the King of the Jungle, but I actually live in grasslands. India has a small group of us in Gir forest, Gujarat!",
+      "I am one of the few big cats that live and hunt in groups.",
+      "The male of my species has a big fluffy mane around his face, and I have a very powerful roar.",
+      "I am called the King of the Jungle, but I actually live in grasslands.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Lion_waiting_in_Namibia.jpg/500px-Lion_waiting_in_Namibia.jpg",
     sound: null,
   },
   {
-    name: "Fox",
+    name: "Crow",
     region: "🌍 Worldwide",
     hints: [
-      "I use the Earth's magnetic field like a compass to judge distance and direction when pouncing on prey hidden under snow.",
-      "I am a small, clever wild animal with a bushy tail, pointy ears, and a narrow face.",
-      "I am famous for being sly and cunning in folk stories — I look like a mix of a dog and a cat!",
+      "I am a very smart bird with all-black feathers and a strong beak.",
+      "You can often find me in cities and villages, making a loud 'kaw-kaw' sound.",
+      "In famous stories, I am the bird that dropped stones into a pot to drink water.",
     ],
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Vulpes_vulpes_ssp_fulvus.jpg/500px-Vulpes_vulpes_ssp_fulvus.jpg",
+      "https://i.pinimg.com/736x/8f/2b/53/8f2b53596a85e0d1760a74be3699f5fa.jpg",
     sound: null,
   },
   {
     name: "Crocodile",
     region: "🇮🇳 India",
     hints: [
-      "I have not changed much in over 200 million years — I was alive when dinosaurs roamed the Earth. I also cannot stick out my tongue.",
-      "I am a large reptile with very powerful jaws and tough scaly skin. I live in rivers and lakes.",
-      "I lie completely still in water pretending to be a floating log — then I suddenly snap at my prey!",
+      "I am a large reptile with tough, scaly skin and a long tail that helps me swim fast.",
+      "I live in rivers and lakes and I have very strong jaws and sharp teeth.",
+      "I look like a big green lizard with a long mouth.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Nile_crocodile_head.jpg/250px-Nile_crocodile_head.jpg",
     sound: null,
   },
   {
+    name: "Frog",
+    region: "🌍 Worldwide",
+    hints: [
+      "I am a small amphibian that starts my life as a tadpole swimming in the water with a tail and gills.",
+      "I have a long, sticky tongue that I can flick out super fast to catch flies and other insects.",
+      "I usually live near ponds or damp places because I need to keep my skin wet to stay healthy.",
+    ],
+    image:
+      "https://www.pugdundeesafaris.com/blog/wp-content/uploads/2020/01/common-indian-toad.png",
+    sound: null,
+  },
+  {
+    name: "Honey Bee",
+    region: "🌍 Worldwide",
+    hints: [
+      "I am a small flying insect with yellow and black stripes.",
+      "I fly from flower to flower to collect nectar and I live in a hive.",
+      "I make sweet honey and I have a 'buzz' sound when I fly.",
+    ],
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Apis_mellifera_Western_honey_bee.jpg/500px-Apis_mellifera_Western_honey_bee.jpg",
+    sound: null,
+  },
+  {
     name: "Snake",
     region: "🇮🇳 India",
     hints: [
-      "I have no eyelids — my eyes are always open, even when I sleep. I smell the air using my forked tongue.",
-      "I have no legs or arms. I move by sliding my long body on the ground and I shed my skin as I grow.",
-      "Some of us are venomous and some are not. I hiss when scared and I eat rats whole!",
+      "I have no legs, arms, or ears. I move by sliding my long body on the ground in a wavy line.",
+      "I stick my tongue out to smell the air and I can shed my old skin.",
+      "Some of us are venomous and some are not, and I make a hissing sound.",
     ],
     image:
       "https://i.pinimg.com/236x/68/fd/3e/68fd3e1207db9b0874fd7fdfc4a0678f.jpg",
     sound: null,
   },
   {
+    name: "Spider",
+    region: "🌍 Worldwide",
+    hints: [
+      "I am a small creature with eight legs and I do not have any wings or antennae.",
+      "I am an expert at spinning sticky silk webs to catch flies and other small insects.",
+      "I have many eyes, but I mostly feel vibrations to know when my dinner is near.",
+    ],
+    image:
+      "https://cms.bbcearth.com/sites/default/files/image/funfact/Spider-Fun-Fact_Factfile_BBC-Earth-Factfiles-.jpg?imwidth=1920",
+    sound: null,
+  },
+  {
     name: "Peacock",
     region: "🇮🇳 India",
     hints: [
-      "My spectacular tail — called a train — is not actually my tail feathers. It grows from my back, and I rattle it to make a rustling sound during courtship.",
-      "The male of my species has a huge, fan-like display of feathers with eye-shaped patterns. The female is plain brown.",
-      "I am India's national bird. I am famous for dancing when it rains and spreading my beautiful colourful feathers!",
+      "I am a large, beautiful bird with a long blue neck and a small crown of feathers on my head.",
+      "I am famous for opening my back feathers into a big, colorful fan with many 'eye' spots.",
+      "I am the national bird of India, and I love to dance and spread my feathers when it rains.",
     ],
     image:
       "https://img.freepik.com/free-photo/peacock-walking-ground-with-its-tail-open_181624-27071.jpg?semt=ais_user_personalization&w=740&q=80",
@@ -231,9 +255,9 @@ const ANIMALS = [
     name: "Rabbit",
     region: "🌍 Worldwide",
     hints: [
-      "My teeth never stop growing my entire life, so I must constantly chew to keep them worn down.",
-      "I am a small fluffy mammal with very long ears and a small cotton-ball tail. I hop everywhere I go.",
-      "I love eating carrots and vegetables. Bugs Bunny from cartoons is based on me!",
+      "I am a small fluffy mammal with very long ears and a small cotton-ball tail.",
+      "I have long front teeth that never stop growing, so I constantly chew grass and vegetables.",
+      "I live in underground tunnels called burrows and I can sense danger quickly with my twitching nose.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Oryctolagus_cuniculus_Rcdo.jpg/500px-Oryctolagus_cuniculus_Rcdo.jpg",
@@ -243,9 +267,9 @@ const ANIMALS = [
     name: "Rhinoceros",
     region: "🇮🇳 India",
     hints: [
-      "My horn is not made of bone — it is made of keratin, the same material as your fingernails, pressed tightly together.",
       "I am a very large, heavy animal with thick armour-like skin and one or two horns on my nose.",
-      "I love rolling in mud to keep cool. The Indian version of me lives in Assam and has just one horn!",
+      "My horn is not made of bone — it is made of keratin, the same material as your fingernails.",
+      "I love to roll in the mud to protect my sensitive skin from the sun and keep myself cool.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/7/77/Great-Indian-one-horned-rhinoceros-at-Kaziranga-national-park-in-Assam-India.jpg",
@@ -255,9 +279,9 @@ const ANIMALS = [
     name: "Hippopotamus",
     region: "🌍 Africa",
     hints: [
-      "I sweat a red oily liquid that acts as sunscreen and kills bacteria — people once thought I was sweating blood.",
       "I am one of the heaviest land animals, but I spend most of my time in rivers and lakes to keep cool.",
-      "I open my huge mouth very wide to show off or scare enemies. My name means 'river horse' in Greek!",
+      "I open my huge mouth very wide to show off my long tusk-like teeth or scare enemies.",
+      "My name means 'river horse' in Greek!",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/f/f2/Portrait_Hippopotamus_in_the_water.jpg",
@@ -267,69 +291,44 @@ const ANIMALS = [
     name: "Giraffe",
     region: "🌍 Africa",
     hints: [
-      "I only sleep about 30 minutes a day in short bursts, and my heart is massive — nearly 11 kg — to pump blood all the way up my long neck.",
       "I am the tallest animal in the world. My neck alone is almost as tall as a grown man.",
+      "I have a very powerful heart to pump blood all the way up my neck to my brain.",
       "I have a brown patchy coat and I eat leaves from the very tops of tall trees that no other animal can reach!",
     ],
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Giraffe_Mikumi_National_Park.jpg/500px-Giraffe_Mikumi_National_Park.jpg",
+    image: "https://cdn.britannica.com/55/75855-050-3D52AB80/giraffe-Kenya.jpg",
     sound: null,
   },
   {
     name: "Zebra",
     region: "🌍 Africa",
     hints: [
-      "My stripes confuse biting insects — the black and white pattern makes it hard for flies to land on me. No two of us have the same pattern.",
       "I look exactly like a horse but I am covered in black and white stripes all over my body.",
-      "I live in Africa and roam in large herds. You have definitely seen me in The Lion King!",
+      "My stripes confuse biting insects — the black and white pattern makes it hard for flies to land on me.",
+      "I live in the grassy plains of Africa and travel in large groups called herds to stay safe from lions.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Plains_Zebra_Equus_quagga.jpg/500px-Plains_Zebra_Equus_quagga.jpg",
     sound: null,
   },
   {
-    name: "Hyena",
-    region: "🌍 Africa",
+    name: "Shark",
+    region: "🌍 Ocean",
     hints: [
-      "My jaw is so powerful I can crush and digest bones that no other animal can eat. My laughing sound is actually a signal of excitement, not happiness.",
-      "I make a laughing sound to communicate and I live in groups. I am both a hunter and a scavenger.",
-      "I am the villain in The Lion King — Shenzi, Banzai, and Ed are all my kind!",
+      "I am a large fish with many rows of sharp teeth and a fin on my back.",
+      "I never stop swimming, and I can smell even a tiny drop of blood in the ocean.",
+      "I am the star of the movie 'Jaws' and the famous 'Baby Shark' song.",
     ],
     image:
-      "https://images.unsplash.com/photo-1750345536221-0758d52ce0ff?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGh5ZW5hc3xlbnwwfHwwfHx8MA%3D%3D",
-    sound: null,
-  },
-  {
-    name: "Jackal",
-    region: "🌍 Africa / India",
-    hints: [
-      "I can hear the sound of a vulture landing from several kilometres away and I use that as a clue to find food.",
-      "I am a medium-sized wild animal that looks like a thin dog. I howl at night and eat both meat and fruits.",
-      "I am famous in Indian folk tales for being the clever trickster animal who outsmarts the lion!",
-    ],
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/3/37/Flickr_-_Rainbirder_-_Golden_Jackal_%281%29.jpg",
-    sound: null,
-  },
-  {
-    name: "Porcupine",
-    region: "🇮🇳 India",
-    hints: [
-      "My quills are not shot out like arrows — that is a myth. But they detach very easily and stick painfully into anything that touches them.",
-      "I am covered in long, sharp, needle-like spines all over my back that I rattle as a warning.",
-      "I am a large rodent found in Indian forests. My spines protect me like armour from any predator!",
-    ],
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/e/e3/Weissschwanzstachelschwein_Hystrix_indica_Tierpark_Hellabrunn-12_%28cropped%29.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/White_shark.jpg/500px-White_shark.jpg",
     sound: null,
   },
   {
     name: "Kangaroo",
     region: "🌍 Australia",
     hints: [
-      "I cannot walk backwards, and a newborn baby of mine is only the size of a grape when it crawls into my pouch.",
-      "I carry my baby in a pouch on my belly and I move by hopping on my two powerful back legs.",
-      "I live in Australia and I am on their national coat of arms — the most famous animal of that country!",
+      "I am a furry mammal with huge back legs that I use like powerful springs to jump very high.",
+      "I carry my baby in a pouch on my belly and I move by hopping on my two powerful legs.",
+      "I am the most famous animal from Australia and I am a great jumper but I cannot walk backward.",
     ],
     image:
       "https://plus.unsplash.com/premium_photo-1666777247057-40fd5ff166c4?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8a2FuZ2Fyb298ZW58MHx8MHx8fDA%3D",
@@ -339,21 +338,21 @@ const ANIMALS = [
     name: "Penguin",
     region: "🌍 Antarctica",
     hints: [
-      "I am a bird, but my wings evolved into flippers over millions of years. I can swim faster than most fish but I cannot fly at all.",
-      "I wear a black and white coat that looks like a formal suit. I waddle on land but glide through water.",
-      "I live on icy cold land near the South Pole. You have seen me in cartoons like Happy Feet!",
+      "I am a bird that cannot fly through the air, but I use my wings like flippers to 'fly' underwater.",
+      "I wear a black and white coat that looks like a formal suit, which helps me hide from hunters in the ocean.",
+      "I live on the icy lands of the South Pole, where I waddle on my short legs or slide on my belly over the ice.",
     ],
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a3/Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg",
+      "https://cdn.britannica.com/77/81277-050-2A6A35B2/Adelie-penguin.jpg",
     sound: null,
   },
   {
     name: "Dolphin",
     region: "🌍 Ocean",
     hints: [
-      "I use clicking sounds that bounce off objects to build a 3D picture of my surroundings — even seeing inside the bodies of fish and other creatures.",
-      "I am a very intelligent sea mammal that breathes air, loves jumping near boats, and lives in social groups.",
-      "I always look like I am smiling and I am one of the friendliest animals to humans. You have seen me at aquarium shows!",
+      "I am a very intelligent sea animal that lives in oceans and seas around the world.",
+      "I breathe air through a hole on top of my head and love to jump and swim near boats.",
+      "I use clicking and whistling sounds to communicate, and I am known for being friendly to humans.",
     ],
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Tursiops_truncatus_01.jpg/500px-Tursiops_truncatus_01.jpg",
